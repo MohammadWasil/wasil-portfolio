@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analyzing Domain Shift for Steering Angles Using Grad-CAM in Self Driving Cars</title>
+
+  <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #ffffff;
+      color: #222;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 40px;
+    }
+
+    section {
+      margin-bottom: 50px;
+      text-align: left;
+    }
+
+    section h2 {
+      margin-bottom: 15px;
+    }
+
+    section p {
+      margin-bottom: 15px;
+      line-height: 1.6;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      margin: 20px 0;
+      display: block;
+    }
+
+    table {
+    border-collapse: collapse; /* remove spacing between cells */
+    border: none; /* remove table border */
+    }
+    td {
+        border: none; /* remove cell borders */
+        padding: 5px; /* optional spacing */
+    }
+    
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <h1>Grad-CAM: What Does a Self-Driving CNN See Under Domain Shift? (WiP)</h1>
+
+    <section>
+      <h2>Background</h2>
+      <p>
+        A few years ago, I trained a Convolutional Neural Network to predict the steering angles for a self-driving car. Recently, I revisited the project and extended it inside Unity3D, using a simulated environment to test how the network behaves under different visual conditions.
+      </p>
+      <p>
+        Instead of retraining the model, I kept the original CNN fixed and changed only the environmental scenarios. The goal was simple: How robust is a learned driving model when the world looks different?
+      </p>
+      <img src="assets/blog/output.gif" alt="Self-Driving Car Class Activation Map">
+    </section>
+
+
+    <section>
+      <h2>Domain Shift in Self-Driving</h2>
+        <p>
+            Domain shift occurs when the data distribution seen during inference differs from the data distribution used during training. In self-driving systems, this problem is unavoidable. Weather, lighting, camera exposure, road materials, and atmospheric effects all change the visual appearance of the same physical scene.
+        </p>
+        <p>
+            The steering models are particularly sensitive to domain shift because, they rely directly on raw pixel input, and lack explicit semantic or geometric constraints.
+        </p> 
+        <p>
+            We need to understand how a trained model adapts (or fails) when it encounters such domain Shifts.
+        </p>
+
+        <table>
+            <tr>
+                <td><img src="assets/blog/img/Normal.png" alt="Image 1"></td>
+                <td><img src="assets/blog/img/Rain.png" alt="Image 2"></td>
+            </tr>
+            <tr>
+                <td><img src="assets/blog/img/Rain and fog.png" alt="Image 3"></td>
+                <td><img src="assets/blog/img/Evening.png" alt="Image 4"></td>
+            </tr>
+        </table>
+
+
+
+    </section>
+
+    <section>
+      <h2>Experimental Setup</h2>
+      <p>
+        The CNN used in this experiment was trained several years ago on a limited set of conditions: clear weather, consistent lighting, and relatively clean visuals on a long curved road. It follows a common architecture for self-driving research, stacked convolutional layers for spatial feature extraction, followed by fully connected layers that regress directly to a steering angle.
+        I evaluated the same trained model across all different scenarios.</br>
+        Simulation Scenarios:
+        <ul>
+            <li>Clear weather with good visibility</li>
+            <li>Rainy Weather</li>
+            <li>Rain with road smog</li>
+            <li>Evening / low-light scene</li>
+        </ul>
+      </p>
+    </section>
+
+    <section>
+      <h2>What does the model see?</h2>
+      <p>
+        The model continued to produce steering angles under all scenarios, but raw predictions alone don’t say much about how the model is making decisions. This is where interpretability becomes essential.
+
+        To gain insight into the models internal reasoning, I ran Grad-CAM alongside the steering predictions.
+
+        Grad-CAM (Gradient-weighted Class Activation Mapping) is used in classification tasks, but it can also be adapted to regression problems like predicting steering angles. Instead of visualizing class-specific importance, Grad-CAM highlights which spatial regions of the image most influence the scalar steering angle.
+
+      </p>
+    </section>
+
+    <section>
+      <h2>My Observations</h2>
+      <p>
+        The Grad-CAM heatmaps shows that the model’s internal attention patterns changed across different domains.
+        <h3>Clear Weather:</h3>
+        <p>
+            <img src="assets/blog/heatmaps/sdc_heatmap_original_1.png" alt="Clear Weather Grad-CAM"></br>
+        </p>
+        <h3>Rainy Weather:</h3>
+        <p>
+            <img src="assets/blog/heatmaps/sdc_heatmap_original_29_rain.png" alt="Clear Weather Grad-CAM"></br>
+        </p>
+        <h3>Rain with Road Smog:</h3>
+        <p>
+            <img src="assets/blog/heatmaps/sdc_heatmap_original_12_rain_smoke.png" alt="Clear Weather Grad-CAM"></br>
+        </p>
+        <h3>Evening / Low-Light Scene:</h3>
+        <p>
+            <img src="assets/blog/heatmaps/sdc_heatmap_original_3_evening.png" alt="Clear Weather Grad-CAM"></br>
+        </p>
+      </p>
+    </section>
+
+
+  </div>
+</body>
+</html>
