@@ -232,7 +232,42 @@
   window.addEventListener('load', navmenuScrollspy);
   document.addEventListener('scroll', navmenuScrollspy);
 
+  // tracker
+  document.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', async function(e) {
+          const clickedURL = this.href;
+          const linkText = this.innerText.trim() || clickedURL;
 
+          let locationInfo = "Location unavailable";
+
+          try {
+              // 1. Fetch user's location based on their IP address (Free, no API key needed)
+              const geoResponse = await fetch('https://ipapi.co/json/');
+              const geoData = await geoResponse.json();
+              
+              if (geoData && geoData.city) {
+                  locationInfo = `${geoData.city}, ${geoData.region}, ${geoData.country_name} (IP: ${geoData.ip})`;
+              }
+          } catch (error) {
+              console.error("Could not fetch location", error);
+          }
+
+          // 2. Build the message with the location data included
+          const messageBody = `🚀 Portfolio Alert!\n- Clicked Link: "${linkText}"\n- URL: ${clickedURL}\n- Location: ${locationInfo}`;
+
+          // Send via Web3Forms (Email) ---
+          
+          fetch('https://api.web3forms.com/submit', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+              body: JSON.stringify({
+                  access_key: '9a9629a0-d4a4-40dc-8b10-48a5d5c7d9ce',
+                  subject: `Portfolio Click from ${locationInfo.split(',')[0]}!`,
+                  message: messageBody
+              })
+          });
+      });
+  });
 
   // Fallback for skill box SVGs: if an image fails to load, replace with initials
   document.addEventListener('DOMContentLoaded', () => {
