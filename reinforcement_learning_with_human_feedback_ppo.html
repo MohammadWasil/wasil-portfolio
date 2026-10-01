@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Blog Post Title - Confluence Style</title>
+    <style>
+        :root {
+            --confluence-blue: #0052CC;
+            --confluence-dark: #172B4D;
+            --confluence-text: #42526E;
+            --confluence-bg: #F4F5F7;
+            --confluence-border: #DFE1E6;
+            --panel-info-bg: #DEEBFF;
+            --panel-info-border: #0052CC;
+            --panel-warn-bg: #FFFAEF;
+            --panel-warn-border: #FFAB00;
+            --tag-bg: #EBECF0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+            color: var(--confluence-dark);
+            background-color: #ffffff;
+            line-height: 1.5;
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .confluence-blog-container {
+            max-width: 840px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 40px;
+            border: 1px solid var(--confluence-border);
+            border-radius: 3px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        /* Breadcrumbs / Space Header */
+        .confluence-breadcrumbs {
+            font-size: 12px;
+            color: var(--confluence-text);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+        .confluence-breadcrumbs a {
+            color: var(--confluence-blue);
+            text-decoration: none;
+        }
+        .confluence-breadcrumbs a:hover {
+            text-decoration: underline;
+        }
+
+        /* Title Area */
+        .confluence-title {
+            font-size: 32px;
+            font-weight: 600;
+            color: var(--confluence-dark);
+            margin-top: 0;
+            margin-bottom: 16px;
+            line-height: 1.25;
+        }
+
+        /* Metadata Line */
+        .confluence-metadata {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 13px;
+            color: var(--confluence-text);
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--confluence-border);
+            margin-bottom: 24px;
+        }
+        .author-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background-color: #dfe1e6;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 11px;
+            color: var(--confluence-dark);
+        }
+
+        /* Labels / Tags */
+        .confluence-labels {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        .confluence-tag {
+            background-color: var(--tag-bg);
+            color: var(--confluence-text);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 3px;
+            text-decoration: none;
+        }
+
+        /* Table of Contents Macro Box */
+        .confluence-toc {
+            background-color: var(--confluence-bg);
+            border: 1px solid var(--confluence-border);
+            padding: 16px 20px;
+            border-radius: 3px;
+            margin-bottom: 30px;
+        }
+        .confluence-toc-title {
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            color: var(--confluence-text);
+            margin-bottom: 8px;
+        }
+        .confluence-toc ul {
+            margin: 0;
+            padding-left: 20px;
+            font-size: 14px;
+        }
+        .confluence-toc li {
+            margin-bottom: 4px;
+        }
+        .confluence-toc a {
+            color: var(--confluence-blue);
+            text-decoration: none;
+        }
+        .confluence-toc a:hover {
+            text-decoration: underline;
+        }
+
+        /* Typography */
+        h2 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-top: 32px;
+            margin-bottom: 12px;
+            border-bottom: 1px solid var(--confluence-border);
+            padding-bottom: 6px;
+        }
+        h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 24px;
+            margin-bottom: 8px;
+        }
+        p {
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+
+        /* Confluence Panels (Info / Note / Warning) */
+        .confluence-panel {
+            padding: 12px 16px;
+            border-left: 4px solid;
+            border-radius: 0 3px 3px 0;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .confluence-panel.info {
+            background-color: var(--panel-info-bg);
+            border-color: var(--panel-info-border);
+        }
+        .confluence-panel.warning {
+            background-color: var(--panel-warn-bg);
+            border-color: var(--panel-warn-border);
+        }
+
+        /* Code Blocks */
+        pre {
+            background-color: var(--confluence-bg);
+            border: 1px solid var(--confluence-border);
+            padding: 16px;
+            border-radius: 3px;
+            font-family: "SFMono-Medium", "Segoe UI Mono", "Roboto Mono", Menlo, monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+
+        /* Tables */
+        table.confluence-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        table.confluence-table th, table.confluence-table td {
+            border: 1px solid var(--confluence-border);
+            padding: 8px 12px;
+            text-align: left;
+        }
+        table.confluence-table th {
+            background-color: var(--confluence-bg);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+<div class="confluence-blog-container">
+
+    <!-- Space / Breadcrumb -->
+    <div class="confluence-breadcrumbs">
+        <a href="#">Reinforcement Learning</a> / Blog Posts / 2026
+    </div>
+
+    <!-- Blog Post Title -->
+    <h1 class="confluence-title">[WiP] Proximal Policy Optimization: Reinforcement Learning with Human Feedback and the maths behind fine-tuning RLHF</h1>
+
+    <!-- Metadata Section -->
+    <div class="confluence-metadata">
+        <div class="author-avatar" title="Author Name">MW</div>
+        <span><strong>Mohammad Wasil Saleem</strong> published on October 1, 2026</span>
+        <span>•</span>
+        <span>4 min read</span>
+    </div>
+
+    <!-- Labels / Tags -->
+    <div class="confluence-labels">
+        <!--<span class="confluence-tag">release-notes</span> -->
+    </div>
+
+    <!-- Table of Contents Macro -->
+    <div class="confluence-toc">
+        <div class="confluence-toc-title">Table of Contents</div>
+        <ul>
+            <li><a href="#overview">1. Overview & Context</a></li>
+            <li><a href="#rl_rlhf">2. The InstructGPT Paradigm: From Raw Text to Human Alignment</a></li>
+            <li><a href="#human_preference">3. Human Preference Data</a></li>
+            <li><a href="#reward-model">4. Reward Model</a></li>
+
+
+        </ul>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="confluence-body">
+        
+        <h2 id="overview">1. Overview & Context</h2>
+        <p>When we fine-tune a Large Language Model using standard next-token prediction, we teach it grammar, syntax, and basic pattern matching. But raw text generation alone doesn't guarantee that an LLM will be helpful. To truly align a model with human intent, we need a mechanism to reward desirable behavior and discourage toxic or unhelpful outputs. <Br/>
+           <Br/>
+           With Reinforcement Learning with Human Feedback (RLHF) and its optimization algorithm, Proximal Policy Optimization (PPO), we can help align the model with human preferences with the help of Reward Modeling.<Br/>
+           <Br/>
+            In this blog, we will explore the complete mathematical and architectural pipeline behind RLHF, walking step-by-step through preference modeling, KL divergence penalties, advantage estimation, and the clipped surrogate loss that keeps modern LLM alignment stable.</p>
+
+        <h2 id="rl_rlhf">2. The InstructGPT Paradigm: From Raw Text to Human Alignment</h2>
+        <p></p>
+
+        <p>To understand how modern alignment works, we can look back at OpenAI's foundational InstructGPT paper, which established the blueprint for aligning base models like GPT-3 with human intent. The pipeline relies on three fundamental phases:</p>
+        <p>1. Pretraining: The model ingests massive datasets to learn grammar, facts, and next-token prediction, but it only knows how to complete text, not how to follow instructions.</p>
+        <p>2. Supervised Fine-Tuning (SFT): The model is trained on curated conversations—human queries paired with ideal, high-quality responses written by human annotators (chat conversations). This SFT checkpoint serves as the critical starting point for the alignment phase.</p>
+        <p>3. Reinforcement Learning from Human Feedback (RLHF): The phase where the model learns to optimize its behavior based on human values.</p>
+
+        <!-- Info Panel Macro Example -->
+        <div class="confluence-panel info">
+            <strong>Note:</strong> In traditional reinforcement learning, a model learns through trial and error via a continuous feedback loop:
+            <Br/>
+            <div class="flow-diagram" style="display: flex; justify-content: center; align-items: center; gap: 5px; margin: 0px 0; font-weight: 500;">
+                <span>Prompt</span> &longrightarrow; 
+                <span>LLM</span> &longrightarrow; 
+                <span>Response</span> &longrightarrow; 
+                <span>Human Evaluation</span> &longrightarrow; 
+                <span>Parameter Update</span>
+            </div>
+            <p>
+                While effective, keeping a human in the loop to evaluate every single model generation during training is slow, expensive, and completely unscalable.
+            </p>
+
+            <p>
+                To bypass this bottleneck, InstructGPT introduced a brilliant proxy, it replaces the human evaluator with a trained neural network, or an LLM (the Reward Model):
+            </p>
+
+            <div class="flow-diagram" style="display: flex; justify-content: center; align-items: center; gap: 5px; margin: 0px 0; font-weight: 500;">
+                <span>Prompt</span> &longrightarrow; 
+                <span>LLM</span> &longrightarrow; 
+                <span>Response</span> &longrightarrow; 
+                <span>Reward Model</span> &longrightarrow; 
+                <span>Parameter Update</span>
+            </div>
+        </div>
+
+        <p>In the sections that follow, we will unpack the machinery behind this pipeline:</p>
+        <ul style="line-height: 1.6; margin-top: 10px; padding-left: 20px;">
+            <li>What <strong>Reward Models</strong> are and how are they structured.</li>
+            <li>How <strong>pairwise preference data</strong> is used to train them.</li>
+            <li>How we use the scalar reward values to update LLM parameters via reinforcement learning (PPO).</li>
+            <li>The PPO loss function, its derivative, and a concrete working example of a single parameter update with Gradient Descent.</li>
+            <li>The limitations of this approach</li>
+        </ul>
+
+
+        <p>Before diving into how reinforcement learning updates our model, we need to understand the data that makes it all possible, along with the standard naming conventions used in the literature.</p>
+
+        <!-- Nomenclature Note Panel -->
+        <div class="confluence-panel info" style="--panel-info-bg: #DEEBFF; --panel-info-border: #0052CC; padding: 12px 16px; border-left: 4px solid; border-radius: 0 3px 3px 0; margin-bottom: 20px; font-size: 14px; background-color: var(--panel-info-bg); border-color: var(--panel-info-border);">
+            <p style="margin: 0;"><strong>Quick Nomenclature Note:</strong></p>
+            <ul style="margin: 6px 0 0 20px; padding: 0;">
+                <li><strong>SFT Base / Reference Model:</strong> The model fine-tuned on supervised chat conversations. Generally denoted as <code>&pi;<sub>SFT</sub></code> or <code>&pi;<sub>ref</sub></code>. It serves as our baseline anchor.</li>
+                <li><strong>Reward Model:</strong> The scoring network trained to evaluate text quality, typically denoted as <code>r<sub>&psi;</sub></code> (parameterized by weights <code>&psi;</code>).</li>
+            </ul>
+        </div>
+    
+        <h2 id="human_preference">3. Human Preference Data</h2>
+        
+        <p>To train the reward model, we use pairwise human preference data:</p>
+        
+        <ul style="line-height: 1.6; margin-top: 10px; padding-left: 20px;">
+            <li><strong>Collect Prompts :</strong> Gather a large pool of prompts (eg, <em>"What is 2 + 2?"</em>).</li>
+            <li><strong>Generate Multiple Responses:</strong> Pass these prompts through our SFT Base Model (&pi;<sub>SFT</sub>). For a single prompt, we can generate 2, 3, or even 4 different candidate responses.</li>
+            <li><strong>Human Ranking:</strong> Human annotators look at the prompt and the candidate responses, ranking them from best to worst.</li>
+            <li><strong>Forming Pairs (y_w vs y_l):</strong> After ranking, we turn those rankings into binary pairs.
+            </li>
+        </ul>
+
+        <h3>Example Preference Data Structure</h3>
+                
+<pre style="background: #f4f5f7; padding: 12px; border-radius: 4px; font-family: monospace; font-size: 13px;">
+{
+"prompt": "x: What is 2 + 2?",
+"chosen": "y_w: The answer to 2 + 2 is 4.",
+"rejected": "y_l: 2 + 2 is 5, but sometimes math is relative."
+}</pre>
+
+        <h2 id="reward-model">4. Reward Model</h2>
+            <h3>Reward Model Architecture</h3>
+            <p>The Reward Model isn't built from scratch. It is initialized directly from our trained SFT checkpoint (&pi;<sub>SFT</sub>) with some modifications:</p>
+            
+            <ul style="line-height: 1.6; margin-top: 10px; padding-left: 20px;">
+                <li><strong>Strip the Output Head:</strong> We remove the final vocabulary-projection layer (the linear layer responsible for outputting next-token probabilities across the entire vocabulary).</li>
+                <li><strong>Add a Scalar Head:</strong> We replace it with a simple linear layer that outputs a <strong>single scalar value</strong> (representing how good, safe, or rewarding the generated text sequence is).</li>
+            </ul>
+
+
+        <div class="confluence-panel warning">
+            <strong>Warning:</strong> 
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
