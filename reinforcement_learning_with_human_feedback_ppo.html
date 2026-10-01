@@ -208,11 +208,11 @@
 
     <!-- Space / Breadcrumb -->
     <div class="confluence-breadcrumbs">
-        <a href="#">Reinforcement Learning</a> / Blog Posts / 2026 / Oct
+        <a href="#">Reinforcement Learning</a> / Blog Posts / 2026
     </div>
 
     <!-- Blog Post Title -->
-    <h1 class="confluence-title">Reinforcement Learning with Human Feedback (Proximal Policy Optimization) and the maths behind fine-tuning RLHF</h1>
+    <h1 class="confluence-title">[WiP] Proximal Policy Optimization: Reinforcement Learning with Human Feedback and the maths behind fine-tuning RLHF</h1>
 
     <!-- Metadata Section -->
     <div class="confluence-metadata">
@@ -224,9 +224,7 @@
 
     <!-- Labels / Tags -->
     <div class="confluence-labels">
-        <span class="confluence-tag">release-notes</span>
-        <span class="confluence-tag">engineering</span>
-        <span class="confluence-tag">q4-planning</span>
+        <!--<span class="confluence-tag">release-notes</span> -->
     </div>
 
     <!-- Table of Contents Macro -->
@@ -234,8 +232,11 @@
         <div class="confluence-toc-title">Table of Contents</div>
         <ul>
             <li><a href="#overview">1. Overview & Context</a></li>
-            <li><a href="#key-changes">2. Key Technical Changes</a></li>
-            <li><a href="#migration">3. Action Items & Migration Steps</a></li>
+            <li><a href="#rl_rlhf">2. The InstructGPT Paradigm: From Raw Text to Human Alignment</a></li>
+            <li><a href="#human_preference">3. Human Preference Data</a></li>
+            <li><a href="#reward-model">4. Reward Model</a></li>
+
+
         </ul>
     </div>
 
@@ -249,7 +250,7 @@
            <Br/>
             In this blog, we will explore the complete mathematical and architectural pipeline behind RLHF, walking step-by-step through preference modeling, KL divergence penalties, advantage estimation, and the clipped surrogate loss that keeps modern LLM alignment stable.</p>
 
-        <h2 id="key-changes">2. The InstructGPT Paradigm: From Raw Text to Human Alignment</h2>
+        <h2 id="rl_rlhf">2. The InstructGPT Paradigm: From Raw Text to Human Alignment</h2>
         <p></p>
 
         <p>To understand how modern alignment works, we can look back at OpenAI's foundational InstructGPT paper, which established the blueprint for aligning base models like GPT-3 with human intent. The pipeline relies on three fundamental phases:</p>
@@ -306,7 +307,7 @@
             </ul>
         </div>
     
-        <h2 id="migration">3. Human Preference Data</h2>
+        <h2 id="human_preference">3. Human Preference Data</h2>
         
         <p>To train the reward model, we use pairwise human preference data:</p>
         
@@ -327,18 +328,18 @@
 "rejected": "y_l: 2 + 2 is 5, but sometimes math is relative."
 }</pre>
 
-        <h2 id="migration">4. Reward Model</h2>
+        <h2 id="reward-model">4. Reward Model</h2>
             <h3>Reward Model Architecture</h3>
-            <p>The Reward Model isn't built from scratch. It is initialized directly from our trained SFT checkpoint (&pi;<sub>SFT</sub>) with a couple of key modifications:</p>
+            <p>The Reward Model isn't built from scratch. It is initialized directly from our trained SFT checkpoint (&pi;<sub>SFT</sub>) with some modifications:</p>
             
             <ul style="line-height: 1.6; margin-top: 10px; padding-left: 20px;">
                 <li><strong>Strip the Output Head:</strong> We remove the final vocabulary-projection layer (the linear layer responsible for outputting next-token probabilities across the entire vocabulary).</li>
-                <li><strong>Add a Scalar Head:</strong> We replace it with a simple linear layer that outputs a <strong>single scalar value</strong> (representing how "good," safe, or rewarding the generated text sequence is).</li>
+                <li><strong>Add a Scalar Head:</strong> We replace it with a simple linear layer that outputs a <strong>single scalar value</strong> (representing how good, safe, or rewarding the generated text sequence is).</li>
             </ul>
 
 
         <div class="confluence-panel warning">
-            <strong>Warning:</strong> Failing to update your headers before the cutoff date will result in deprecated request failures.
+            <strong>Warning:</strong> 
         </div>
 
     </div>
