@@ -3,6 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- KaTeX CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" crossorigin="anonymous">
+
+    <!-- The loading of KaTeX deferred for performance -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js" crossorigin="anonymous"></script>
+
+    <!-- To automatically render math in text elements -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" crossorigin="anonymous"
+        onload="renderMathInElement(document.body);"></script>
     <title>Your Blog Post Title - Confluence Style</title>
     <style>
         :root {
@@ -212,7 +221,7 @@
     </div>
 
     <!-- Blog Post Title -->
-    <h1 class="confluence-title">[WiP] Proximal Policy Optimization: Reinforcement Learning with Human Feedback and the maths behind fine-tuning RLHF</h1>
+    <h1 class="confluence-title">[WiP] Proximal Policy Optimization: Reinforcement Learning with Human Feedback (with the maths behind fine-tuning RLHF)</h1>
 
     <!-- Metadata Section -->
     <div class="confluence-metadata">
@@ -254,9 +263,12 @@
         <p></p>
 
         <p>To understand how modern alignment works, we can look back at OpenAI's foundational InstructGPT paper, which established the blueprint for aligning base models like GPT-3 with human intent. The pipeline relies on three fundamental phases:</p>
-        <p>1. Pretraining: The model ingests massive datasets to learn grammar, facts, and next-token prediction, but it only knows how to complete text, not how to follow instructions.</p>
-        <p>2. Supervised Fine-Tuning (SFT): The model is trained on curated conversations—human queries paired with ideal, high-quality responses written by human annotators (chat conversations). This SFT checkpoint serves as the critical starting point for the alignment phase.</p>
-        <p>3. Reinforcement Learning from Human Feedback (RLHF): The phase where the model learns to optimize its behavior based on human values.</p>
+        <ol style="line-height: 1.6; margin-top: 10px; padding-left: 20px;">
+            <li><strong>Pretraining</strong>: The model ingests massive datasets to learn grammar, facts, and next-token prediction, but it only knows how to complete text, not how to follow instructions.</li>
+            <li><strong>Supervised Fine-Tuning (SFT)</strong>: The model is trained on curated conversations—human queries paired with ideal, high-quality responses written by human annotators (chat conversations). This SFT checkpoint serves as the critical starting point for the alignment phase.</li>
+            <li><strong>Reinforcement Learning from Human Feedback (RLHF)</strong>: The phase where the model learns to optimize its behavior based on human values.</li>
+        </ol>
+
 
         <!-- Info Panel Macro Example -->
         <div class="confluence-panel info">
@@ -336,7 +348,73 @@
                 <li><strong>Strip the Output Head:</strong> We remove the final vocabulary-projection layer (the linear layer responsible for outputting next-token probabilities across the entire vocabulary).</li>
                 <li><strong>Add a Scalar Head:</strong> We replace it with a simple linear layer that outputs a <strong>single scalar value</strong> (representing how good, safe, or rewarding the generated text sequence is).</li>
             </ul>
+        
+            <h3>Reward Model Input and Output</h3>
+            <!-- Info Panel Macro Example -->
+            <div class="confluence-panel info">
+                
+                <Br/>
+                <div class="flow-diagram" style="display: flex; justify-content: center; align-items: center; gap: 5px; margin: 0px 0; font-weight: 500;">
+                    <span>Prompt + Chosen Response (y_w)</span> &longrightarrow; 
+                    <span>Reward Model</span> &longrightarrow; 
+                    <span>Scalar Score (r_w) (e.g., +2.5)</span> 
+                </div>
 
+                <div class="flow-diagram" style="display: flex; justify-content: center; align-items: center; gap: 5px; margin: 0px 0; font-weight: 500;">
+                    <span>Prompt + Rejected Response (y_l)</span> &longrightarrow; 
+                    <span>Reward Model</span> &longrightarrow; 
+                    <span>Scalar Score (r_l) (e.g., -1.1)</span>
+                </div>
+            </div>
+
+            <h3>The Bradley-Terry Preference Model &amp; Loss Function</h3>
+    
+            <p>
+                The Reward Model is trained using the Bradley-Terry preference model, which computes the probability that the chosen response \(y_w\) is genuinely better than the rejected response \(y_l\) given a prompt \(x\):
+            </p>
+
+            <!-- Math Block: Probability Formula -->
+            <div class="math-block" style="text-align: center; margin: 16px 0; font-style: italic;">
+                $$P(y_w \succ y_l \vert x) = \sigma(r_w - r_l) = \frac{1}{1 + e^{-(r_w - r_l)}}$$
+            </div>
+
+            <h4>1. Concrete Numerical Calculation</h4>
+            <p>Let's walk through how this works with actual numbers:</p>
+            <ul style="line-height: 1.6; margin-top: 6px; padding-left: 20px;">
+                <li><strong>Calculate the score difference:</strong> 
+                    <div style="margin: 6px 0;">$$r_w - r_l = 2.0 - 0.5 = 1.5$$</div>
+                </li>
+                <li><strong>Apply the sigmoid function:</strong> 
+                    <div style="margin: 6px 0;">$$\sigma(1.5) = \frac{1}{1 + e^{-1.5}} = \frac{1}{1 + 0.2231} \approx \mathbf{0.8176}$$</div>
+                    <p style="margin: 4px 0 0 0; color: #555; font-size: 13px;"><em>(This means our Reward Model calculates an 81.76% probability that the chosen response is better).</em></p>
+                </li>
+            </ul>
+
+            <h4>2. The Reward Model Loss Function</h4>
+            <p>
+                The loss function for training the Reward Model is the negative log-likelihood of the correct preference. We want to maximize this probability, which means minimizing the negative log-likelihood:
+            </p>
+            <div class="math-block" style="text-align: center; margin: 16px 0; font-style: italic;">
+                $$L_{\text{RM}}(\psi) = -\log(\sigma(r_w - r_l))$$
+            </div>
+            <p><strong>Calculated Loss Value:</strong></p>
+            <div style="margin: 6px 0;">$$L_{\text{RM}} = -\log(0.8176) \approx \mathbf{0.2014}$$</div>
+
+            <h4>3. Derivative of the Loss</h4>
+            <p>
+                To update the Reward Model \(r_{\psi}\) via backpropagation, we calculate the derivative of the loss with respect to both scalar scores (\(r_w\) and \(r_l\)):
+            </p>
+            
+            <div style="background: #f4f5f7; padding: 12px 16px; border-radius: 4px; margin: 12px 0; font-family: monospace;">
+                $$\frac{\partial L_{\text{RM}}}{\partial r_w} = \sigma(r_w - r_l) - 1 = 0.8176 - 1 = \mathbf{-0.1824}$$<br><br>
+                $$\frac{\partial L_{\text{RM}}}{\partial r_l} = 1 - \sigma(r_w - r_l) = 1 - 0.8176 = \mathbf{+0.1824}$$
+            </div>
+
+            <p style="font-size: 14px; color: #444;">
+                <strong>Interpretation:</strong> The negative gradient for \(r_w\) pushes its score higher, while the positive gradient for \(r_l\) pushes its score lower, aligning the Reward Model closer to human preferences.
+            </p>
+
+            <p>To know more about Bradley Terry preference model, and how Reward models are trained, you can refer to the this amazing substack: <a href="https://cameronrwolfe.substack.com/p/reward-models">Bradley-Terry Model for Reward Modeling</a></p>
 
         <div class="confluence-panel warning">
             <strong>Warning:</strong> 
