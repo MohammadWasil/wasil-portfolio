@@ -221,7 +221,7 @@
     </div>
 
     <!-- Blog Post Title -->
-    <h1 class="confluence-title">[WiP] Proximal Policy Optimization: Reinforcement Learning with Human Feedback (with the maths behind fine-tuning RLHF)</h1>
+    <h1 class="confluence-title">[WiP] Proximal Policy Optimization: Reinforcement Learning with Human Feedback (with the maths behind fine-tuning LLMs)</h1>
 
     <!-- Metadata Section -->
     <div class="confluence-metadata">
@@ -314,8 +314,9 @@
         <div class="confluence-panel info" style="--panel-info-bg: #DEEBFF; --panel-info-border: #0052CC; padding: 12px 16px; border-left: 4px solid; border-radius: 0 3px 3px 0; margin-bottom: 20px; font-size: 14px; background-color: var(--panel-info-bg); border-color: var(--panel-info-border);">
             <p style="margin: 0;"><strong>Quick Nomenclature Note:</strong></p>
             <ul style="margin: 6px 0 0 20px; padding: 0;">
-                <li><strong>SFT Base / Reference Model:</strong> The model fine-tuned on supervised chat conversations. Generally denoted as <code>&pi;<sub>SFT</sub></code> or <code>&pi;<sub>ref</sub></code>. It serves as our baseline anchor.</li>
-                <li><strong>Reward Model:</strong> The scoring network trained to evaluate text quality, typically denoted as <code>r<sub>&psi;</sub></code> (parameterized by weights <code>&psi;</code>).</li>
+                <li><strong>SFT Base (<code>&pi;<sub>SFT</sub></code>) / Reference Model:</strong> The model fine-tuned on supervised chat conversations. Generally denoted as <code>&pi;<sub>SFT</sub></code> or <code>&pi;<sub>ref</sub></code>. It serves as our baseline anchor.</li>
+                <li><strong>Reward Model (<code>r<sub>&psi;</sub></code>):</strong> The scoring network trained to evaluate text quality, typically denoted as <code>r<sub>&psi;</sub></code> (parameterized by weights <code>&psi;</code>).</li>
+                <li><strong>Policy LLM (<code>&pi;<sub>&theta;</sub></code>):</strong> The language model trained to generate text, typically denoted as <code>&pi;<sub>&theta;</sub></code> (parameterized by weights <code>&theta;</code>).</li>
             </ul>
         </div>
     
@@ -363,7 +364,7 @@
                 <div class="flow-diagram" style="display: flex; justify-content: center; align-items: center; gap: 5px; margin: 0px 0; font-weight: 500;">
                     <span>Prompt + Rejected Response (y_l)</span> &longrightarrow; 
                     <span>Reward Model</span> &longrightarrow; 
-                    <span>Scalar Score (r_l) (e.g., -1.1)</span>
+                    <span>Scalar Score (r_l) (e.g., 0.5)</span>
                 </div>
             </div>
 
@@ -416,9 +417,38 @@
 
             <p>To know more about Bradley Terry preference model, and how Reward models are trained, you can refer to the this amazing substack: <a href="https://cameronrwolfe.substack.com/p/reward-models">Bradley-Terry Model for Reward Modeling</a></p>
 
+        <h2 id="ppo">5. Fine-tuning the Policy</h2>
+            <p>In the next section, we will explore how the Policy LLM is fine-tuned using Proximal Policy Optimization (PPO) to align it with human preferences.</p>    
+
+            <p>Here, we combine everything into PPO trainging step to update LLM weights (<code>&theta;</code>).</p>
+
+            <div class="confluence-panel info">
+                <div class="flow-diagram" style="display: flex; justify-content: center; align-items: center; gap: 5px; margin: 0px 0; font-weight: 500;">
+                    <span>Prompt</span> &longrightarrow; 
+                    <span>Policy LLM (<code>&pi;<sub>&theta;</sub></code>)</span> &longrightarrow; 
+                    <span>Response</span> &longrightarrow; 
+                    <span>Reward Model</span> &longrightarrow; 
+                    <span>Reward (R)</span> &longrightarrow; 
+                    <span>Parameter Update of <code>&pi;<sub>&theta;</sub></code> with PPO</span>
+                </div>
+            </div>
+
+            <h3>Policy LLM Architecture</h3>
+            <p>The Policy LLM isn't built from scratch either. It is initialized directly from our trained SFT checkpoint (&pi;<sub>SFT</sub>) without any modifications.</p>    
+
+            <h3>PPO Clipped Surrogate Loss Function</h3>
+            <p>The PPO algorithm uses a clipped surrogate loss function to update the policy parameters:</p>
+                <div style="background: #f4f5f7; padding: 12px 16px; border-radius: 4px; margin: 12px 0; font-family: monospace;">
+                    $$L_{PPO}(\theta) = - \mathbb{E}_t \left[ \min(r_t(\theta) \hat{A}_{t}, clip(r_t(\theta), 1-\epsilon, 1+\epsilon) \hat{A}_{t}) \right]$$
+                </div>
+            <p>where  <br/>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\(r_t(\theta)\) is the probability ratio, and <br/>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\( \epsilon \) is the clipping parameter, and <br/>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A&#770;<sub>t</sub> is the estimated advantage (action-value) function.</p>
+
         <div class="confluence-panel warning">
             <strong>Warning:</strong> 
-        </div>
+        </div>  
 
     </div>
 
