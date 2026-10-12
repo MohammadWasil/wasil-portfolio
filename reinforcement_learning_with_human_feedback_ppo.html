@@ -221,7 +221,7 @@
     </div>
 
     <!-- Blog Post Title -->
-    <h1 class="confluence-title">[WiP] Proximal Policy Optimization: Reinforcement Learning with Human Feedback (with the maths behind fine-tuning LLMs)</h1>
+    <h1 class="confluence-title">Proximal Policy Optimization: Reinforcement Learning with Human Feedback (with the maths behind fine-tuning LLMs)</h1>
 
     <!-- Metadata Section -->
     <div class="confluence-metadata">
@@ -273,17 +273,14 @@
         <div class="confluence-panel info">
             <strong>Note:</strong> In traditional reinforcement learning, a model learns through trial and error via a continuous feedback loop:
             <Br/>
-            <div class="flow-diagram" style="display: flex; justify-content: center; align-items: center; gap: 5px; margin: 0px 0; font-weight: 500;">
-                <span>Prompt</span> &longrightarrow; 
-                <span>LLM</span> &longrightarrow; 
-                <span>Response</span> &longrightarrow; 
-                <span>Human Evaluation</span> &longrightarrow; 
-                <span>Parameter Update</span>
-            </div>
+            <pre style="background: transparent; border: none; padding: 10px; margin: 0; font-family: monospace; font-size: 13px; line-height: 1.4;">
+                        ┌─────┐
+            Prompt ───► │ LLM │───► Response ───► Human Evaluation ───► Parameter Update
+                        └─────┘
+            </pre>
             <p>
                 While effective, keeping a human in the loop to evaluate every single model generation during training is slow, expensive, and completely unscalable.
             </p>
-
             <p>
                 To bypass this bottleneck, InstructGPT introduced a brilliant proxy, it replaces the human evaluator with a trained neural network, or an LLM (the Reward Model):
             </p>
@@ -295,6 +292,11 @@
                 <span>Reward Model</span> &longrightarrow; 
                 <span>Parameter Update</span>
             </div>
+            <pre style="background: transparent; border: none; padding: 10px; margin: 0; font-family: monospace; font-size: 13px; line-height: 1.4;">
+                       ┌─────┐                     ┌──────────────┐
+            Prompt ───►│ LLM │───► Response ──────►│ Reward Model │───► Parameter Update
+                       └─────┘                     └──────────────┘
+            </pre>
         </div>
 
         <p>In the sections that follow, we will unpack the machinery behind this pipeline:</p>
@@ -305,7 +307,6 @@
             <li>The PPO loss function, its derivative, and a concrete working example of a single parameter update with Gradient Descent.</li>
             <li>The limitations of this approach</li>
         </ul>
-
 
         <p>Before diving into how reinforcement learning updates our model, we need to understand the data that makes it all possible, along with the standard naming conventions used in the literature.</p>
 
@@ -353,19 +354,13 @@
             <h3>Reward Model Input and Output</h3>
             <!-- Info Panel Macro Example -->
             <div class="confluence-panel info">
-                
-                <Br/>
-                <div class="flow-diagram" style="display: flex; justify-content: center; align-items: center; gap: 5px; margin: 0px 0; font-weight: 500;">
-                    <span>Prompt + Chosen Response (y_w)</span> &longrightarrow; 
-                    <span>Reward Model</span> &longrightarrow; 
-                    <span>Scalar Score (r_w) (e.g., +2.5)</span> 
-                </div>
-
-                <div class="flow-diagram" style="display: flex; justify-content: center; align-items: center; gap: 5px; margin: 0px 0; font-weight: 500;">
-                    <span>Prompt + Rejected Response (y_l)</span> &longrightarrow; 
-                    <span>Reward Model</span> &longrightarrow; 
-                    <span>Scalar Score (r_l) (e.g., 0.5)</span>
-                </div>
+                <pre style="background: transparent; border: none; padding: 10px; margin: 0; font-family: monospace; font-size: 13px; line-height: 1.4;">
+                                           ┌──────────────┐
+            Prompt + Chosen (y_w) ───────► |              | ───────► Scalar Score: +2.5 (r_w)
+                                           │ Reward Model │
+            Prompt + Rejected (y_l) ─────► |              | ───────► Scalar Score: +0.5 (r_l)
+                                           └──────────────┘
+                </pre>
             </div>
 
             <h3>The Bradley-Terry Preference Model &amp; Loss Function</h3>
@@ -459,15 +454,15 @@
 
             <p>Here, we combine everything into PPO trainging step to update LLM weights (<code>&theta;</code>).</p>
 
+            
+
             <div class="confluence-panel info">
-                <div class="flow-diagram" style="display: flex; justify-content: center; align-items: center; gap: 5px; margin: 0px 0; font-weight: 500;">
-                    <span>Prompt</span> &longrightarrow; 
-                    <span>Policy LLM (<code>&pi;<sub>&theta;</sub></code>)</span> &longrightarrow; 
-                    <span>Response</span> &longrightarrow; 
-                    <span>Reward Model</span> &longrightarrow; 
-                    <span>Reward (R)</span> &longrightarrow; 
-                    <span>Parameter Update of <code>&pi;<sub>&theta;</sub></code> with PPO</span>
-                </div>
+                <pre style="background: transparent; border: none; padding: 10px; margin: 0; font-family: monospace; font-size: 13px; line-height: 1.4;">
+                    ┌──────────┐                     ┌──────────────┐
+        Prompt ───► │Policy LLM│───► Response ──────►│ Reward Model │───► Reward (R) ──► Update π<sub>&theta;</sub> with PPO
+                    │  (π_θ)   │                     └──────────────┘
+                    └──────────┘
+                </pre>
             </div>
 
             In PPO/RLHF, we want to optimize a policy &pi;<sub>&theta;</sub> to maximize the expected reward from a reward model r<sub>&psi;</sub>, while penalizing it for drifting too far from a reference model &pi;<sub>SFT</sub> using KL divergence:
@@ -502,7 +497,7 @@
             <p>PPO uses a secondary small neural network called the Critic.</p>
 
             <div class="confluence-panel info" style="--panel-info-bg: #DEEBFF; --panel-info-border: #0052CC; padding: 12px 16px; border-left: 4px solid; border-radius: 0 3px 3px 0; margin-bottom: 20px; font-size: 14px; background-color: var(--panel-info-bg); border-color: var(--panel-info-border);">
-                <p style="margin: 0;"><strong>Critic</strong></p>
+                <h4><strong>Critic</strong></h4>
                 <ul style="margin: 6px 0 0 20px; padding: 0;">
                     <li>While the Policy LLM (the Actor) &pi;<sub>&theta;</sub> focuses on generating text, the Critic focuses on predicting future success. It acts as an internal baseline tracker.</li>
                     <li>Without a Critic, the model only knows the final score of a response, but it struggles to tell whether a specific output was uniquely brilliant or if the prompt itself was just very easy. The Critic provides that baseline expectation. (tells us whether there has been any improvement so far).</li>
@@ -520,17 +515,108 @@
                 </ul>
             </div>
 
-            The Advantage A&#770;<sub>t</sub> :
+            The Advantage A&#770;<sub>t</sub> is given by:
             <div style="background: #f4f5f7; padding: 12px 16px; border-radius: 4px; margin: 12px 0; font-family: monospace;">
                 $$\hat{A}_t = \text{Actual Reward Received} - \text{Expected Reward (Value Function from Critic)}$$
             </div>
-               
+
+            <h4>Clipping Parameter &epsilon;</h4>
+            The clipping parameter, &epsilon; (typically 0.2), which caps the ratio between 1-&epsilon; and 1+&epsilon;. This prevents massive, unstable weight updates.
 
             <h4>Interpretation</h4>
             <p>Before looking at the reward, the Critic guesses: "Based on this prompt, I expect the model to get a score of around +1.0." If the actual combined reward turns out to be +2.5, the Advantage is +1.5 (2.5 - 1.0). This tells the model: "This response wasn't just good; it was better than expected."</p>
 
+            <p> Before we go thorugh the mathematics to understand the PPO loss function, lets calculate their derivatives.</p>
+            <div class="confluence-panel info" style="--panel-info-bg: #DEEBFF; --panel-info-border: #0052CC; padding: 12px 16px; border-left: 4px solid; border-radius: 0 3px 3px 0; margin-bottom: 20px; font-size: 14px; background-color: var(--panel-info-bg); border-color: var(--panel-info-border);">
+                <h4>PPO Derivative:</h4>
+                <p>we only look at the unclipped portion of the objective function (which is active when the model update stays within safe boundaries).</p>
+                <p>The PPO objective function ($J_{\text{CLIP}}$) that we want to maximize is: </p>
+                    $$J_{\text{CLIP}}(\theta) = \hat{\mathbb{E}}_t \left[ \min\left( r_t(\theta)\hat{A}_t, \, \text{clip}(r_t(\theta), 1-\epsilon, 1+\epsilon)\hat{A}_t \right) \right]$$
+                <p>Optimizers like Adam perform minimization (gradient descent), we define our PPO loss function ($L_{\text{PPO}}$) as the negative of the objective:</p>
+                    $$L_{\text{PPO}}(\theta) = - J_{\text{CLIP}}(\theta)$$
+
+                <p>When the probability ratio $r_t(\theta)$ is unclipped, the min function evaluates simply to the unclipped term. Therefore, for an unclipped step, we differentiate:
+                
+                $$
+                \begin{aligned}
+                L_{\text{PPO}}(\theta) &= -\hat{\mathbb{E}}_t \left[ r_t(\theta)\hat{A}_t \right] \\
+                                       &= -\hat{\mathbb{E}}_t \left[ \frac{\pi_{\theta}}{\pi_{\text{SFT}}}  \hat{A}_t \right] \\
+                                       &= -\hat{\mathbb{E}}_t \left[ \frac{\hat{A}_t}{\pi_{\text{SFT}}}  \pi_{\theta} \right] \\
+                \text{Taking derivative w.r.t. } \theta: \\
+                \nabla_\theta L_{\text{PPO}} &= -\hat{\mathbb{E}}_t \left[ \frac{\hat{A}_t}{\pi_{\text{SFT}}} \cdot \nabla_\theta \pi_\theta \right]  \text{since $\hat{A}_t$ and $\pi_{\text{SFT}}$ are constants w.r.t. $\theta$} \\
+                                             &= -\hat{\mathbb{E}}_t \left[ \frac{\hat{A}_t}{\pi_{\text{SFT}}} \cdot \pi_\theta \cdot \nabla_\theta \log \pi_\theta \right]  \text{(using the log-derivative trick)} \\
+                                             &= -\hat{\mathbb{E}}_t \left[ r_t(\theta) \cdot \hat{A}_t \cdot \nabla_\theta \log \pi_\theta \right]  \text{(substituting $r_t(\theta) = \frac{\pi_\theta}{\pi_{\text{SFT}}}$)} \\
+                \text{Final derivative w.r.t. } \theta: \\
+                \nabla_\theta L_{\text{PPO}} &= - r_t(\theta) \cdot \hat{A}_t \cdot \nabla_\theta \log \pi_\theta
+                \end{aligned}
+                
+
+                $$
+                
+            </div>
+
             <h3>Putting It All Together with maths</h3>
-            -- TODO: Add the complete mathematical derivation of PPO loss, KL penalty, and advantage function with a working example. <br>
+            <p>From above, the penalized reward, R = 2.4942.</p>
+            <p><strong>Case 1 (Ratio is Clipped): When the derivative is zero</strong></p>
+            <p>Let consider a simple example, where we have the following values:</p>
+                <strong>Probability ratio r<sub>t</sub>(&theta;)</strong> = 1.2, <br>
+                <strong>Advantage A<sub>t</sub></strong> = 1.5 (meaning this response performed better than expected), and <br> 
+                <strong>Clipping Parameter (&epsilon;)</strong>: &epsilon; = 0.2 (meaning the ratio is capped between 1 - 0.2 = 0.8 and 1 + 0.2 = 1.2).</p>
+            <p>Now, we can calculate the <strong>PPO Loss</strong>:</p>
+            <div style="background: #f4f5f7; padding: 12px 16px; border-radius: 4px; margin: 12px 0; font-family: monospace;">
+                $$
+                \begin{aligned}
+                L_{PPO}(\theta) &= - \mathbb{E}_t \left[ \min\left(r_t(\theta)\hat{A}_t,; \operatorname{clip}(r_t(\theta),1-\epsilon,1+\epsilon)\hat{A}_t\right) \right] \\
+                &= - \min(1.2 \times 1.5,; \operatorname{clip}(1.2,0.8,1.2)\times 1.5) \\
+                &= - \min(1.8,; 1.2 \times 1.5) \\
+                &= - \min(1.8,; 1.8) \\
+                L_{PPO}(\theta) &= -1.8
+                \end{aligned}
+                $$
+            </div>
+
+            <p>Now, the <strong>derivative of the PPO Loss</strong>:</p>
+            <p>Since, r<sub>t</sub>(&theta;) = 1.2 is at the upper clipping boundary (1 + &epsilon; = 1.2), the derivative of the loss function with respect to &theta; is zero.</p>
+            <div style="background: #f4f5f7; padding: 12px 16px; border-radius: 4px; margin: 12px 0; font-family: monospace;">
+                $$
+                \begin{aligned}
+                \frac{\partial L_{\text{PPO}}(\theta)}{\partial \theta} &= 0
+                \end{aligned}
+                $$
+            </div>
+            
+            <p>This means that the optimizer will not update the model parameters for this particular step, as it has reached the maximum allowed change in probability ratio.</p>
+            <p><strong>Interpretation:</strong> This is a safety break, if a policy update tries to push the model too far too fast, PPO will stop updating the weight in this direction.</p>
+
+            <p><strong>Case 2 (Ratio is Not Clipped): When the derivative is non-zero</strong></p>
+            <p>Let consider a simple example, where we have the following values:</p>
+                <strong>Probability ratio r<sub>t</sub>(&theta;)</strong> = 1.05, (It falls strictly between 0.8 and 1.2, so no clipping occurs.) <br>
+                <strong>Advantage A<sub>t</sub></strong> = 1.5 (meaning this response performed better than expected), and <br> 
+                <strong>Clipping Parameter (&epsilon;)</strong>: &epsilon; = 0.2 (meaning the ratio is capped between 1 - 0.2 = 0.8 and 1 + 0.2 = 1.2).</p>
+             <p>Now, we can calculate the <strong>PPO Loss</strong>:</p>
+            <div style="background: #f4f5f7; padding: 12px 16px; border-radius: 4px; margin: 12px 0; font-family: monospace;">
+                $$
+                \begin{aligned}
+                L_{PPO}(\theta) &= - \mathbb{E}_t \left[ \min\left(r_t(\theta)\hat{A}_t,; \operatorname{clip}(r_t(\theta),1-\epsilon,1+\epsilon)\hat{A}_t\right) \right] \\
+                &= - \min(1.05 \times 1.5,; \operatorname{clip}(1.05,0.8,1.2)\times 1.5) \\
+                &= - \min(1.575,; 1.2 \times 1.5) \\
+                &= - \min(1.575,; 1.8) \\
+                L_{PPO}(\theta) &= -1.575
+                \end{aligned}
+                $$
+            </div>
+
+            <p>Now, the <strong>derivative of the PPO Loss</strong>:</p>
+            <p>Since, r<sub>t</sub>(&theta;) = 1.05 is not at the clipping boundary (unclipped), the objective function depends directly on the model parameter, &theta;.</p>
+            <div style="background: #f4f5f7; padding: 12px 16px; border-radius: 4px; margin: 12px 0; font-family: monospace;">
+                $$
+                \begin{aligned}
+                L_{PPO}(\theta) &= -1.575 \times \frac{\partial \pi_{\theta} }{\partial \theta}
+                \end{aligned}
+                $$
+            </div>
+
+            <p>The model weights (&theta;) are successfully updated by the gradient descent, so that next time it sees a similar prompt, it is sightly more likely to gnerate this preferred style of respone.</p>
             
         <!--
         <div class="confluence-panel warning">
