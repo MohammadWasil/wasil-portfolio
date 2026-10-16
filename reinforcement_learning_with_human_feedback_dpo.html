@@ -286,8 +286,11 @@
             </pre>
         </div>
 
-        IN THE 
-        The DPO Loss Function ($\mathcal{L}_{\text{DPO}}$) mathematically forces the model to do two things at once:Maximize the probability of the Chosen response relative to the Reference model.Minimize the probability of the Rejected response relative to the Reference model.
+        <p>The DPO Loss Function mathematically forces the model to do two things at once:</p>
+        <ul style="margin: 6px 0 0 20px; padding: 0;">
+            <li><p>Maximize the probability of the Chosen response relative to the Reference model.</p></li>
+            <li><p>Minimize the probability of the Rejected response relative to the Reference model.</p></li>
+        </ul>
 
         <p>The standard naming conventions are the same as in the previous blog on PPO:</p>
 
@@ -320,19 +323,22 @@
 }</pre>
 
         
-        <h2 id="fine-tune_policy">5. Fine-tuning the Policy</h2>
-            <p>In this section, we will explore how the Policy LLM is fine-tuned using Proximal Policy Optimization (PPO) to align it with human preferences.</p>    
+        <h2 id="fine-tune_policy">4. Fine-tuning the Policy with DPO</h2>
+            <p>In this section, we will explore how the Policy LLM is fine-tuned using Direct Policy Optimization (DPO) to align it with human preferences.</p>    
 
-            <p>Here, we combine everything into PPO trainging step to update LLM weights (<code>&theta;</code>).</p>
-
-            
+            <p>Here, we combine everything into DPO training step to update LLM weights (<code>&theta;</code>).</p>
 
             <div class="confluence-panel info">
+                <p>For every prompt in your batch, </p>
                 <pre style="background: transparent; border: none; padding: 10px; margin: 0; font-family: monospace; font-size: 13px; line-height: 1.4;">
-                    ┌──────────┐                     ┌──────────────┐
-        Prompt ───► │Policy LLM│───► Response ──────►│ Reward Model │───► Reward (R) ──► Update π<sub>&theta;</sub> with PPO
-                    │  (π_θ)   │                     └──────────────┘
-                    └──────────┘
+                              ┌──────────┐                     
+        y<sub>w</sub> ───►    │Policy LLM│───► Response ──────► DPO Loss ──► Update π<sub>&theta;</sub> with PPO
+                              │  (π_θ)   │                     
+                              └──────────┘
+                              ┌──────────┐                     
+        y<sub>w</sub> ───►    │  SFT LLM │───► Response ──────► DPO Loss ──► Update π<sub>&theta;</sub> with PPO
+                              │  (π_sft) │                     
+                              └──────────┘
                 </pre>
             </div>
 
