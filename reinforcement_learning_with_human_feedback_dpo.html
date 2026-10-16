@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- KaTeX CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" crossorigin="anonymous">
+
+    <!-- The loading of KaTeX deferred for performance -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js" crossorigin="anonymous"></script>
+
+    <!-- To automatically render math in text elements -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" crossorigin="anonymous"
+        onload="renderMathInElement(document.body);"></script>
+    <title>Your Blog Post Title - Confluence Style</title>
+    <style>
+        :root {
+            --confluence-blue: #0052CC;
+            --confluence-dark: #172B4D;
+            --confluence-text: #42526E;
+            --confluence-bg: #F4F5F7;
+            --confluence-border: #DFE1E6;
+            --panel-info-bg: #DEEBFF;
+            --panel-info-border: #0052CC;
+            --panel-warn-bg: #FFFAEF;
+            --panel-warn-border: #FFAB00;
+            --tag-bg: #EBECF0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+            color: var(--confluence-dark);
+            background-color: #ffffff;
+            line-height: 1.5;
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .confluence-blog-container {
+            max-width: 840px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 40px;
+            border: 1px solid var(--confluence-border);
+            border-radius: 3px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        /* Breadcrumbs / Space Header */
+        .confluence-breadcrumbs {
+            font-size: 12px;
+            color: var(--confluence-text);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+        .confluence-breadcrumbs a {
+            color: var(--confluence-blue);
+            text-decoration: none;
+        }
+        .confluence-breadcrumbs a:hover {
+            text-decoration: underline;
+        }
+
+        /* Title Area */
+        .confluence-title {
+            font-size: 32px;
+            font-weight: 600;
+            color: var(--confluence-dark);
+            margin-top: 0;
+            margin-bottom: 16px;
+            line-height: 1.25;
+        }
+
+        /* Metadata Line */
+        .confluence-metadata {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 13px;
+            color: var(--confluence-text);
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--confluence-border);
+            margin-bottom: 24px;
+        }
+        .author-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background-color: #dfe1e6;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 11px;
+            color: var(--confluence-dark);
+        }
+
+        /* Labels / Tags */
+        .confluence-labels {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        .confluence-tag {
+            background-color: var(--tag-bg);
+            color: var(--confluence-text);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 3px;
+            text-decoration: none;
+        }
+
+        /* Table of Contents Macro Box */
+        .confluence-toc {
+            background-color: var(--confluence-bg);
+            border: 1px solid var(--confluence-border);
+            padding: 16px 20px;
+            border-radius: 3px;
+            margin-bottom: 30px;
+        }
+        .confluence-toc-title {
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            color: var(--confluence-text);
+            margin-bottom: 8px;
+        }
+        .confluence-toc ul {
+            margin: 0;
+            padding-left: 20px;
+            font-size: 14px;
+        }
+        .confluence-toc li {
+            margin-bottom: 4px;
+        }
+        .confluence-toc a {
+            color: var(--confluence-blue);
+            text-decoration: none;
+        }
+        .confluence-toc a:hover {
+            text-decoration: underline;
+        }
+
+        /* Typography */
+        h2 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-top: 32px;
+            margin-bottom: 12px;
+            border-bottom: 1px solid var(--confluence-border);
+            padding-bottom: 6px;
+        }
+        h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 24px;
+            margin-bottom: 8px;
+        }
+        p {
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+
+        /* Confluence Panels (Info / Note / Warning) */
+        .confluence-panel {
+            padding: 12px 16px;
+            border-left: 4px solid;
+            border-radius: 0 3px 3px 0;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .confluence-panel.info {
+            background-color: var(--panel-info-bg);
+            border-color: var(--panel-info-border);
+        }
+        .confluence-panel.warning {
+            background-color: var(--panel-warn-bg);
+            border-color: var(--panel-warn-border);
+        }
+
+        /* Code Blocks */
+        pre {
+            background-color: var(--confluence-bg);
+            border: 1px solid var(--confluence-border);
+            padding: 16px;
+            border-radius: 3px;
+            font-family: "SFMono-Medium", "Segoe UI Mono", "Roboto Mono", Menlo, monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+
+        /* Tables */
+        table.confluence-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        table.confluence-table th, table.confluence-table td {
+            border: 1px solid var(--confluence-border);
+            padding: 8px 12px;
+            text-align: left;
+        }
+        table.confluence-table th {
+            background-color: var(--confluence-bg);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+<div class="confluence-blog-container">
+
+    <!-- Space / Breadcrumb -->
+    <div class="confluence-breadcrumbs">
+        <a href="#">Reinforcement Learning</a> / Blog Posts / 2026
+    </div>
+
+    <!-- Blog Post Title -->
+    <h1 class="confluence-title">Direct Policy Optimization (DPO): Reinforcement Learning with Human Feedback (with the maths behind fine-tuning LLMs)</h1>
+
+    <!-- Metadata Section -->
+    <div class="confluence-metadata">
+        <div class="author-avatar" title="Author Name">MW</div>
+        <span><strong>Mohammad Wasil Saleem</strong> published on October 1, 2026</span>
+        <span>•</span>
+        <span>4 min read</span>
+    </div>
+
+    <!-- Labels / Tags -->
+    <div class="confluence-labels">
+        <!--<span class="confluence-tag">release-notes</span> -->
+    </div>
+
+    <!-- Table of Contents Macro -->
+    <div class="confluence-toc">
+        <div class="confluence-toc-title">Table of Contents</div>
+        <ul>
+            <li><a href="#overview">1. Overview & Context</a></li>
+            <li><a href="#whydpo">2. Why DPO?</a></li>
+            <li><a href="#dpo">3. Direct Policy Optimization (DPO)</a></li>
+            <li><a href="#dpovsppo">4. How DPO differs from PPO?</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="confluence-body">
+        
+        <h2 id="overview">1. Overview & Context</h2>
+        <p>When we fine-tune a Large Language Model using standard next-token prediction, we teach it grammar, syntax, and basic pattern matching. But raw text generation alone doesn't guarantee that an LLM will be helpful. To truly align a model with human intent, we need a mechanism to reward desirable behavior and discourage toxic or unhelpful outputs. <Br/>
+        <Br/>
+        With Reinforcement Learning with Human Feedback (RLHF) and its optimization algorithm, Direct Policy Optimization (DPO), we can help align the model with human preferences with the help of Reward Modeling.<Br/>
+        <Br/>
+        In the previous blog, Proximal Policy Optimization: Reinforcement Learning with Human Feedback, we explored the complete mathematical and architectural pipeline behind RLHF with PPO.<Br/>
+        <Br/>
+        In this blog, we will explore the complete mathematical and architectural pipeline behind RLHF with DPO, and how it differs from PPO.</p>            
+
+        <h2 id="whydpo">2. Why DPO?</h2>
+        <p>As we have already seen in previous blog, we need 4 models for alignemtn in PPO, namely, Reference Model (SFT LLM), Actor (Policy LLM), Reward Model (adapted from SFT), and , Critic Model(Value Function LLM). Training all of these models can be computationally expensive and complex.</p>
+        <p>DPO simplify this process by directly optimizing the policy model directly on human preferences without the need for a separate reward model or critic LLM.</p>
+        <p>Direct Policy Optimization (DPO) offers several advantages over traditional Reinforcement Learning with Human Feedback (RLHF) approaches like Proximal Policy Optimization (PPO):</p>
+        
+        <ul style="line-height: 1.6; margin-top: 10px; padding-left: 20px;">
+            <li><p><strong>Simpler Implementation</strong>: DPO eliminates the need for complex reward modeling and policy gradient estimation.</p></li>
+            <li><p><strong>Reduced Variance</strong>: By directly optimizing the policy, DPO can reduce the variance in the gradient estimates.</p></li>
+            <li><p><strong>Better Sample Efficiency</strong>: DPO can achieve better performance with fewer samples compared to PPO.</p></li>
+        </ul>
+        
+        <h2 id="dpo">3. Direct Policy Optimization (DPO)</h2>
+
+        <p>We can rewrite the Reward Model's scoring function directly in terms of the LLM's own token probabilities. Therefore, instead of using a separate reward model to evaluate the response, DPO looks at the LLM itself, and evaluates, how likely is the policy llm to generate a choosen response compared to our reference LLM model, and similarly, how likely is the policy llm to generate a rejected response compared to the reference LLM model.</p>
+        <p>Therefore, we only need two models: the policy model and the reference model.</p>
+
+        <!-- Info Panel Macro Example -->
+        <div class="confluence-panel info">
+            <strong>Note:</strong> In traditional reinforcement learning, a model learns through trial and error via a continuous feedback loop:
+            TODO: NEED TO UPDATE THIS
+            <pre style="background: transparent; border: none; padding: 10px; margin: 0; font-family: monospace; font-size: 13px; line-height: 1.4;">
+                        ┌─────┐
+            Prompt ───► │ LLM │───► Response ───► DPO Loss Function ───► Parameter Update
+                        └─────┘
+            </pre>
+        </div>
+
+        <p>The DPO Loss Function mathematically forces the model to do two things at once:</p>
+        <ul style="margin: 6px 0 0 20px; padding: 0;">
+            <li><p>Maximize the probability of the Chosen response relative to the Reference model.</p></li>
+            <li><p>Minimize the probability of the Rejected response relative to the Reference model.</p></li>
+        </ul>
+
+        <p>The standard naming conventions are the same as in the previous blog on PPO:</p>
+
+        <!-- Nomenclature Note Panel -->
+        <div class="confluence-panel info" style="--panel-info-bg: #DEEBFF; --panel-info-border: #0052CC; padding: 12px 16px; border-left: 4px solid; border-radius: 0 3px 3px 0; margin-bottom: 20px; font-size: 14px; background-color: var(--panel-info-bg); border-color: var(--panel-info-border);">
+            <p style="margin: 0;"><strong>Quick Nomenclature Note of all the different LLMs used (Total 4):</strong></p>
+            <ul style="margin: 6px 0 0 20px; padding: 0;">
+                <li><strong>SFT Base (<code>&pi;<sub>SFT</sub></code>) / Reference Model:</strong> The model fine-tuned on supervised chat conversations. Generally denoted as <code>&pi;<sub>SFT</sub></code> or <code>&pi;<sub>ref</sub></code>. It serves as our baseline anchor.</li>
+                <li><strong>Policy LLM (<code>&pi;<sub>&theta;</sub></code>):</strong> The language model trained to generate text, typically denoted as <code>&pi;<sub>&theta;</sub></code> (parameterized by weights <code>&theta;</code>).</li>
+            </ul>
+        </div>
+    
+        <h2 id="human_preference">3. Human Preference Data</h2>
+        
+        <p>To train the reward model, we use pairwise human preference data, like we did for reward model training in PPO:</p>
+        
+        <ul style="line-height: 1.6; margin-top: 10px; padding-left: 20px;">
+            <li><p><strong>Collect Prompts :</strong>The instruction or question given to the model.</p></li>
+            <li><p><strong>Chosen Response (y<sub>w</sub>) :</strong> The preferred, high-quality answer (written by a human or a better model).</p></li>
+            <li><p><strong>Rejected Response (y<sub>l</sub>) :</strong> The dispreferred, lower-quality answer (unhelpful response generated by the SFT model).</p></li>
+        </ul>
+
+        <h3>Example Preference Data Structure</h3>
+                
+<pre style="background: #f4f5f7; padding: 12px; border-radius: 4px; font-family: monospace; font-size: 13px;">
+{
+"prompt": "x: What is 2 + 2?",
+"chosen": "y_w: The answer to 2 + 2 is 4.",
+"rejected": "y_l: 2 + 2 is 5, but sometimes math is relative."
+}</pre>
+
+        
+        <h2 id="fine-tune_policy">4. Fine-tuning the Policy with DPO</h2>
+            <p>In this section, we will explore how the Policy LLM is fine-tuned using Direct Policy Optimization (DPO) to align it with human preferences.</p>    
+
+            <p>Here, we combine everything into DPO training step to update LLM weights (<code>&theta;</code>).</p>
+
+            <div class="confluence-panel info">
+                <p>For every prompt in your batch, </p>
+                <pre style="background: transparent; border: none; padding: 10px; margin: 0; font-family: monospace; font-size: 13px; line-height: 1.4;">
+                              ┌──────────┐                     
+        y<sub>w</sub> ───►    │Policy LLM│───► Response ──────► DPO Loss ──► Update π<sub>&theta;</sub> with PPO
+                              │  (π_θ)   │                     
+                              └──────────┘
+                              ┌──────────┐                     
+        y<sub>w</sub> ───►    │  SFT LLM │───► Response ──────► DPO Loss ──► Update π<sub>&theta;</sub> with PPO
+                              │  (π_sft) │                     
+                              └──────────┘
+                </pre>
+            </div>
+
+            In PPO/RLHF, we want to optimize a policy &pi;<sub>&theta;</sub> to maximize the expected reward from a reward model r<sub>&psi;</sub>, while penalizing it for drifting too far from a reference model &pi;<sub>SFT</sub> using KL divergence:
+            <div style="background: #f4f5f7; padding: 12px 16px; border-radius: 4px; margin: 12px 0; font-family: monospace;">
+                $$\max_{\pi} \mathbb{E}_{x \sim \mathcal{D}, y \sim \pi(y\vert{}x)} \left[ r(x,y) \right] - \beta D_{\text{KL}}(\pi_{\theta}(y\vert{}x) \parallel \pi_{\text{ref}}(y\vert{}x))$$
+            </div>
+
+            <h3>Policy LLM Architecture</h3>
+            <p>The Policy LLM isn't built from scratch. It is initialized directly from our trained SFT checkpoint (&pi;<sub>SFT</sub>) without any modifications.</p>    
+
+            <h3>PPO Clipped Surrogate Loss Function</h3>
+            <p>The PPO algorithm uses a clipped surrogate loss function to update the policy parameters:</p>
+                <div style="background: #f4f5f7; padding: 12px 16px; border-radius: 4px; margin: 12px 0; font-family: monospace;">
+                    $$L_{PPO}(\theta) = - \mathbb{E}_t \left[ \min(r_t(\theta) \hat{A}_{t}, clip(r_t(\theta), 1-\epsilon, 1+\epsilon) \hat{A}_{t}) \right]$$
+                </div>
+            <p>where  <br/>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\(r_t(\theta)\) is the probability ratio, and <br/>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\( \epsilon \) is the clipping parameter, and <br/>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A&#770;<sub>t</sub> is the estimated advantage (action-value) function.</p>
+
+            <h4>Probability Ratio r<sub>t</sub>(&theta;)</h4>
+            <p>The probability ratio \(r_t(\theta)\) is defined as:</p>
+            <div style="background: #f4f5f7; padding: 12px 16px; border-radius: 4px; margin: 12px 0; font-family: monospace;">
+                $$r_t(\theta) = \frac{Probability of response under \pi_{\theta}}{Probability of response under \pi_{\theta_{SFT}}}$$
+                if r<sub>t</sub> > 1, the new model likes the response more than the old model did.
+            </div>
+
+            As the optimizer updates the weights to create a "new" model (&pi;<sub>&theta;</sub>), run the exact same response through both models (&pi;<sub>&theta;</sub> and &pi;<sub>SFT</sub>) to see how much their probability outputs have shifted. If r<sub>t</sub> > 1, the new model likes the response more than the old model did.
+
+            <h4>Advantage Function A&#770;<sub>t</sub> </h4>
+            
+            <p>PPO uses a secondary small neural network called the Critic.</p>
+
+            <div class="confluence-panel info" style="--panel-info-bg: #DEEBFF; --panel-info-border: #0052CC; padding: 12px 16px; border-left: 4px solid; border-radius: 0 3px 3px 0; margin-bottom: 20px; font-size: 14px; background-color: var(--panel-info-bg); border-color: var(--panel-info-border);">
+                <h4><strong>Critic</strong></h4>
+                <ul style="margin: 6px 0 0 20px; padding: 0;">
+                    <li>While the Policy LLM (the Actor) &pi;<sub>&theta;</sub> focuses on generating text, the Critic focuses on predicting future success. It acts as an internal baseline tracker.</li>
+                    <li>Without a Critic, the model only knows the final score of a response, but it struggles to tell whether a specific output was uniquely brilliant or if the prompt itself was just very easy. The Critic provides that baseline expectation. (tells us whether there has been any improvement so far).</li>
+                </ul>
+                <h4>Critic Architecture</h4>
+                <ul style="margin: 6px 0 0 20px; padding: 0;">
+                    <li>The Base Structure: The Critic shares the exact same underlying architecture as SFT LLM, &pi;<sub>SFT</sub>.</li>
+                    <li>The Modification: Just like the Reward Model, the final text-generation layer (the language modeling head that outputs vocabulary tokens) is stripped off. It is replaced with a linear regression head that outputs a single scalar value.</li>
+                </ul>
+
+                <h4>Inputs and Outputs</h4>
+                <ul style="margin: 6px 0 0 20px; padding: 0;">
+                    <li>Input: Prompt + Response (generated so far).</li>
+                    <li>Output: A single scalar number representing the expected final reward the model should receive from that point onward.</li>
+                </ul>
+            </div>
+
+            The Advantage A&#770;<sub>t</sub> is given by:
+            <div style="background: #f4f5f7; padding: 12px 16px; border-radius: 4px; margin: 12px 0; font-family: monospace;">
+                $$\hat{A}_t = \text{Actual Reward Received} - \text{Expected Reward (Value Function from Critic)}$$
+            </div>
+
+            <h4>Clipping Parameter &epsilon;</h4>
+            The clipping parameter, &epsilon; (typically 0.2), which caps the ratio between 1-&epsilon; and 1+&epsilon;. This prevents massive, unstable weight updates.
+
+            <h4>Interpretation</h4>
+            <p>Before looking at the reward, the Critic guesses: "Based on this prompt, I expect the model to get a score of around +1.0." If the actual combined reward turns out to be +2.5, the Advantage is +1.5 (2.5 - 1.0). This tells the model: "This response wasn't just good; it was better than expected."</p>
+
+            <p> Before we go thorugh the mathematics to understand the PPO loss function, lets calculate their derivatives.</p>
+            <div class="confluence-panel info" style="--panel-info-bg: #DEEBFF; --panel-info-border: #0052CC; padding: 12px 16px; border-left: 4px solid; border-radius: 0 3px 3px 0; margin-bottom: 20px; font-size: 14px; background-color: var(--panel-info-bg); border-color: var(--panel-info-border);">
+                <h4>PPO Derivative:</h4>
+                <p>we only look at the unclipped portion of the objective function (which is active when the model update stays within safe boundaries).</p>
+                <p>The PPO objective function ($J_{\text{CLIP}}$) that we want to maximize is: </p>
+                    $$J_{\text{CLIP}}(\theta) = \hat{\mathbb{E}}_t \left[ \min\left( r_t(\theta)\hat{A}_t, \, \text{clip}(r_t(\theta), 1-\epsilon, 1+\epsilon)\hat{A}_t \right) \right]$$
+                <p>Optimizers like Adam perform minimization (gradient descent), we define our PPO loss function ($L_{\text{PPO}}$) as the negative of the objective:</p>
+                    $$L_{\text{PPO}}(\theta) = - J_{\text{CLIP}}(\theta)$$
+
+                <p>When the probability ratio $r_t(\theta)$ is unclipped, the min function evaluates simply to the unclipped term. Therefore, for an unclipped step, we differentiate:
+                
+                $$
+                \begin{aligned}
+                L_{\text{PPO}}(\theta) &= -\hat{\mathbb{E}}_t \left[ r_t(\theta)\hat{A}_t \right] \\
+                                       &= -\hat{\mathbb{E}}_t \left[ \frac{\pi_{\theta}}{\pi_{\text{SFT}}}  \hat{A}_t \right] \\
+                                       &= -\hat{\mathbb{E}}_t \left[ \frac{\hat{A}_t}{\pi_{\text{SFT}}}  \pi_{\theta} \right] \\
+                \text{Taking derivative w.r.t. } \theta: \\
+                \nabla_\theta L_{\text{PPO}} &= -\hat{\mathbb{E}}_t \left[ \frac{\hat{A}_t}{\pi_{\text{SFT}}} \cdot \nabla_\theta \pi_\theta \right]  \text{since $\hat{A}_t$ and $\pi_{\text{SFT}}$ are constants w.r.t. $\theta$} \\
+                                             &= -\hat{\mathbb{E}}_t \left[ \frac{\hat{A}_t}{\pi_{\text{SFT}}} \cdot \pi_\theta \cdot \nabla_\theta \log \pi_\theta \right]  \text{(using the log-derivative trick)} \\
+                                             &= -\hat{\mathbb{E}}_t \left[ r_t(\theta) \cdot \hat{A}_t \cdot \nabla_\theta \log \pi_\theta \right]  \text{(substituting $r_t(\theta) = \frac{\pi_\theta}{\pi_{\text{SFT}}}$)} \\
+                \text{Final derivative w.r.t. } \theta: \\
+                \nabla_\theta L_{\text{PPO}} &= - r_t(\theta) \cdot \hat{A}_t \cdot \nabla_\theta \log \pi_\theta
+                \end{aligned}
+                
+
+                $$
+                
+            </div>
+
+            <h3>Putting It All Together with maths</h3>
+            <p>From above, the penalized reward, R = 2.4942.</p>
+            <p><strong>Case 1 (Ratio is Clipped): When the derivative is zero</strong></p>
+            <p>Let consider a simple example, where we have the following values:</p>
+                <strong>Probability ratio r<sub>t</sub>(&theta;)</strong> = 1.2, <br>
+                <strong>Advantage A<sub>t</sub></strong> = 1.5 (meaning this response performed better than expected), and <br> 
+                <strong>Clipping Parameter (&epsilon;)</strong>: &epsilon; = 0.2 (meaning the ratio is capped between 1 - 0.2 = 0.8 and 1 + 0.2 = 1.2).</p>
+            <p>Now, we can calculate the <strong>PPO Loss</strong>:</p>
+            <div style="background: #f4f5f7; padding: 12px 16px; border-radius: 4px; margin: 12px 0; font-family: monospace;">
+                $$
+                \begin{aligned}
+                L_{PPO}(\theta) &= - \mathbb{E}_t \left[ \min\left(r_t(\theta)\hat{A}_t,; \operatorname{clip}(r_t(\theta),1-\epsilon,1+\epsilon)\hat{A}_t\right) \right] \\
+                &= - \min(1.2 \times 1.5,; \operatorname{clip}(1.2,0.8,1.2)\times 1.5) \\
+                &= - \min(1.8,; 1.2 \times 1.5) \\
+                &= - \min(1.8,; 1.8) \\
+                L_{PPO}(\theta) &= -1.8
+                \end{aligned}
+                $$
+            </div>
+
+            <p>Now, the <strong>derivative of the PPO Loss</strong>:</p>
+            <p>Since, r<sub>t</sub>(&theta;) = 1.2 is at the upper clipping boundary (1 + &epsilon; = 1.2), the derivative of the loss function with respect to &theta; is zero.</p>
+            <div style="background: #f4f5f7; padding: 12px 16px; border-radius: 4px; margin: 12px 0; font-family: monospace;">
+                $$
+                \begin{aligned}
+                \frac{\partial L_{\text{PPO}}(\theta)}{\partial \theta} &= 0
+                \end{aligned}
+                $$
+            </div>
+            
+            <p>This means that the optimizer will not update the model parameters for this particular step, as it has reached the maximum allowed change in probability ratio.</p>
+            <p><strong>Interpretation:</strong> This is a safety break, if a policy update tries to push the model too far too fast, PPO will stop updating the weight in this direction.</p>
+
+            <p><strong>Case 2 (Ratio is Not Clipped): When the derivative is non-zero</strong></p>
+            <p>Let consider a simple example, where we have the following values:</p>
+                <strong>Probability ratio r<sub>t</sub>(&theta;)</strong> = 1.05, (It falls strictly between 0.8 and 1.2, so no clipping occurs.) <br>
+                <strong>Advantage A<sub>t</sub></strong> = 1.5 (meaning this response performed better than expected), and <br> 
+                <strong>Clipping Parameter (&epsilon;)</strong>: &epsilon; = 0.2 (meaning the ratio is capped between 1 - 0.2 = 0.8 and 1 + 0.2 = 1.2).</p>
+             <p>Now, we can calculate the <strong>PPO Loss</strong>:</p>
+            <div style="background: #f4f5f7; padding: 12px 16px; border-radius: 4px; margin: 12px 0; font-family: monospace;">
+                $$
+                \begin{aligned}
+                L_{PPO}(\theta) &= - \mathbb{E}_t \left[ \min\left(r_t(\theta)\hat{A}_t,; \operatorname{clip}(r_t(\theta),1-\epsilon,1+\epsilon)\hat{A}_t\right) \right] \\
+                &= - \min(1.05 \times 1.5,; \operatorname{clip}(1.05,0.8,1.2)\times 1.5) \\
+                &= - \min(1.575,; 1.2 \times 1.5) \\
+                &= - \min(1.575,; 1.8) \\
+                L_{PPO}(\theta) &= -1.575
+                \end{aligned}
+                $$
+            </div>
+
+            <p>Now, the <strong>derivative of the PPO Loss</strong>:</p>
+            <p>Since, r<sub>t</sub>(&theta;) = 1.05 is not at the clipping boundary (unclipped), the objective function depends directly on the model parameter, &theta;.</p>
+            <div style="background: #f4f5f7; padding: 12px 16px; border-radius: 4px; margin: 12px 0; font-family: monospace;">
+                $$
+                \begin{aligned}
+                L_{PPO}(\theta) &= -1.575 \times \frac{\partial \pi_{\theta} }{\partial \theta}
+                \end{aligned}
+                $$
+            </div>
+
+            <p>The model weights (&theta;) are successfully updated by the gradient descent, so that next time it sees a similar prompt, it is sightly more likely to gnerate this preferred style of respone.</p>
+            
+        <!--
+        <div class="confluence-panel warning">
+            <strong>Warning:</strong> 
+        </div>
+        -->  
+
+    </div>
+
+</div>
+
+</body>
+</html>
