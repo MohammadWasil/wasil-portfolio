@@ -331,170 +331,60 @@
             <div class="confluence-panel info">
                 <p>For every prompt in your batch, </p>
                 <pre style="background: transparent; border: none; padding: 10px; margin: 0; font-family: monospace; font-size: 13px; line-height: 1.4;">
-                              ┌──────────┐                     
-        y<sub>w</sub> ───►    │Policy LLM│───► Response ──────► DPO Loss ──► Update π<sub>&theta;</sub> with PPO
-                              │  (π_θ)   │                     
-                              └──────────┘
-                              ┌──────────┐                     
-        y<sub>w</sub> ───►    │  SFT LLM │───► Response ──────► DPO Loss ──► Update π<sub>&theta;</sub> with PPO
-                              │  (π_sft) │                     
-                              └──────────┘
+        ┌──────────┐
+y_w ───►│Policy LLM│ ───► log probabilities
+    \  /│  (π_θ)   │
+     \/ └──────────┘
+     /\  
+    /  \┌──────────┐
+y_l ───►│ SFT LLM  │ ───► log probabilities
+        │ (π_sft)  │
+        └──────────┘
                 </pre>
-            </div>
-
-            In PPO/RLHF, we want to optimize a policy &pi;<sub>&theta;</sub> to maximize the expected reward from a reward model r<sub>&psi;</sub>, while penalizing it for drifting too far from a reference model &pi;<sub>SFT</sub> using KL divergence:
-            <div style="background: #f4f5f7; padding: 12px 16px; border-radius: 4px; margin: 12px 0; font-family: monospace;">
-                $$\max_{\pi} \mathbb{E}_{x \sim \mathcal{D}, y \sim \pi(y\vert{}x)} \left[ r(x,y) \right] - \beta D_{\text{KL}}(\pi_{\theta}(y\vert{}x) \parallel \pi_{\text{ref}}(y\vert{}x))$$
             </div>
 
             <h3>Policy LLM Architecture</h3>
             <p>The Policy LLM isn't built from scratch. It is initialized directly from our trained SFT checkpoint (&pi;<sub>SFT</sub>) without any modifications.</p>    
 
-            <h3>PPO Clipped Surrogate Loss Function</h3>
-            <p>The PPO algorithm uses a clipped surrogate loss function to update the policy parameters:</p>
+            <h3>Calculate the Implicit Rewards</h3>
+            <div style="background: #f4f5f7; padding: 12px 16px; border-radius: 4px; margin: 12px 0; font-family: monospace;">
+                $$score_{w} = \beta \log \frac{\pi_\theta(y_w|x)}{\pi_{SFT}(y_w|x)} $$ and
+                $$score_{l} = \beta \log \frac{\pi_\theta(y_l|x)}{\pi_{SFT}(y_l|x)} $$
+                where, 
+                &beta; is a temperature hyperparameter that controls how strictly the model sticks to the reference mode.
+            </div>
+
+            <p>It checks how confident the policy model &pi;<sub>&theta;</sub> is, about this response compared to the reference model &pi;<sub>SFT</sub>.</p>
+
+            <h3>DPO Loss Function</h3>
+            <p>The DPO algorithm uses a simple standard sigmoid cross-entropy loss function to update the policy parameters:</p>
                 <div style="background: #f4f5f7; padding: 12px 16px; border-radius: 4px; margin: 12px 0; font-family: monospace;">
-                    $$L_{PPO}(\theta) = - \mathbb{E}_t \left[ \min(r_t(\theta) \hat{A}_{t}, clip(r_t(\theta), 1-\epsilon, 1+\epsilon) \hat{A}_{t}) \right]$$
+                    $$L_{DPO}(\theta) = - log (\sigma (score_{w} - score_{l}))$$
+                    $$L_{DPO}(\theta) = - log [(\sigma \beta \log \frac{\pi_\theta(y_w|x)}{\pi_{SFT}(y_w|x)} - \beta \log \frac{\pi_\theta(y_l|x)}{\pi_{SFT}(y_l|x)})]$$
                 </div>
-            <p>where  <br/>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\(r_t(\theta)\) is the probability ratio, and <br/>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\( \epsilon \) is the clipping parameter, and <br/>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A&#770;<sub>t</sub> is the estimated advantage (action-value) function.</p>
-
-            <h4>Probability Ratio r<sub>t</sub>(&theta;)</h4>
-            <p>The probability ratio \(r_t(\theta)\) is defined as:</p>
-            <div style="background: #f4f5f7; padding: 12px 16px; border-radius: 4px; margin: 12px 0; font-family: monospace;">
-                $$r_t(\theta) = \frac{Probability of response under \pi_{\theta}}{Probability of response under \pi_{\theta_{SFT}}}$$
-                if r<sub>t</sub> > 1, the new model likes the response more than the old model did.
-            </div>
-
-            As the optimizer updates the weights to create a "new" model (&pi;<sub>&theta;</sub>), run the exact same response through both models (&pi;<sub>&theta;</sub> and &pi;<sub>SFT</sub>) to see how much their probability outputs have shifted. If r<sub>t</sub> > 1, the new model likes the response more than the old model did.
-
-            <h4>Advantage Function A&#770;<sub>t</sub> </h4>
             
-            <p>PPO uses a secondary small neural network called the Critic.</p>
+            <h3>Derivation of the DPO Loss Function</h3>
 
-            <div class="confluence-panel info" style="--panel-info-bg: #DEEBFF; --panel-info-border: #0052CC; padding: 12px 16px; border-left: 4px solid; border-radius: 0 3px 3px 0; margin-bottom: 20px; font-size: 14px; background-color: var(--panel-info-bg); border-color: var(--panel-info-border);">
-                <h4><strong>Critic</strong></h4>
-                <ul style="margin: 6px 0 0 20px; padding: 0;">
-                    <li>While the Policy LLM (the Actor) &pi;<sub>&theta;</sub> focuses on generating text, the Critic focuses on predicting future success. It acts as an internal baseline tracker.</li>
-                    <li>Without a Critic, the model only knows the final score of a response, but it struggles to tell whether a specific output was uniquely brilliant or if the prompt itself was just very easy. The Critic provides that baseline expectation. (tells us whether there has been any improvement so far).</li>
-                </ul>
-                <h4>Critic Architecture</h4>
-                <ul style="margin: 6px 0 0 20px; padding: 0;">
-                    <li>The Base Structure: The Critic shares the exact same underlying architecture as SFT LLM, &pi;<sub>SFT</sub>.</li>
-                    <li>The Modification: Just like the Reward Model, the final text-generation layer (the language modeling head that outputs vocabulary tokens) is stripped off. It is replaced with a linear regression head that outputs a single scalar value.</li>
-                </ul>
-
-                <h4>Inputs and Outputs</h4>
-                <ul style="margin: 6px 0 0 20px; padding: 0;">
-                    <li>Input: Prompt + Response (generated so far).</li>
-                    <li>Output: A single scalar number representing the expected final reward the model should receive from that point onward.</li>
-                </ul>
-            </div>
-
-            The Advantage A&#770;<sub>t</sub> is given by:
-            <div style="background: #f4f5f7; padding: 12px 16px; border-radius: 4px; margin: 12px 0; font-family: monospace;">
-                $$\hat{A}_t = \text{Actual Reward Received} - \text{Expected Reward (Value Function from Critic)}$$
-            </div>
-
-            <h4>Clipping Parameter &epsilon;</h4>
-            The clipping parameter, &epsilon; (typically 0.2), which caps the ratio between 1-&epsilon; and 1+&epsilon;. This prevents massive, unstable weight updates.
-
-            <h4>Interpretation</h4>
-            <p>Before looking at the reward, the Critic guesses: "Based on this prompt, I expect the model to get a score of around +1.0." If the actual combined reward turns out to be +2.5, the Advantage is +1.5 (2.5 - 1.0). This tells the model: "This response wasn't just good; it was better than expected."</p>
-
-            <p> Before we go thorugh the mathematics to understand the PPO loss function, lets calculate their derivatives.</p>
-            <div class="confluence-panel info" style="--panel-info-bg: #DEEBFF; --panel-info-border: #0052CC; padding: 12px 16px; border-left: 4px solid; border-radius: 0 3px 3px 0; margin-bottom: 20px; font-size: 14px; background-color: var(--panel-info-bg); border-color: var(--panel-info-border);">
-                <h4>PPO Derivative:</h4>
-                <p>we only look at the unclipped portion of the objective function (which is active when the model update stays within safe boundaries).</p>
-                <p>The PPO objective function ($J_{\text{CLIP}}$) that we want to maximize is: </p>
-                    $$J_{\text{CLIP}}(\theta) = \hat{\mathbb{E}}_t \left[ \min\left( r_t(\theta)\hat{A}_t, \, \text{clip}(r_t(\theta), 1-\epsilon, 1+\epsilon)\hat{A}_t \right) \right]$$
-                <p>Optimizers like Adam perform minimization (gradient descent), we define our PPO loss function ($L_{\text{PPO}}$) as the negative of the objective:</p>
-                    $$L_{\text{PPO}}(\theta) = - J_{\text{CLIP}}(\theta)$$
-
-                <p>When the probability ratio $r_t(\theta)$ is unclipped, the min function evaluates simply to the unclipped term. Therefore, for an unclipped step, we differentiate:
-                
-                $$
-                \begin{aligned}
-                L_{\text{PPO}}(\theta) &= -\hat{\mathbb{E}}_t \left[ r_t(\theta)\hat{A}_t \right] \\
-                                       &= -\hat{\mathbb{E}}_t \left[ \frac{\pi_{\theta}}{\pi_{\text{SFT}}}  \hat{A}_t \right] \\
-                                       &= -\hat{\mathbb{E}}_t \left[ \frac{\hat{A}_t}{\pi_{\text{SFT}}}  \pi_{\theta} \right] \\
-                \text{Taking derivative w.r.t. } \theta: \\
-                \nabla_\theta L_{\text{PPO}} &= -\hat{\mathbb{E}}_t \left[ \frac{\hat{A}_t}{\pi_{\text{SFT}}} \cdot \nabla_\theta \pi_\theta \right]  \text{since $\hat{A}_t$ and $\pi_{\text{SFT}}$ are constants w.r.t. $\theta$} \\
-                                             &= -\hat{\mathbb{E}}_t \left[ \frac{\hat{A}_t}{\pi_{\text{SFT}}} \cdot \pi_\theta \cdot \nabla_\theta \log \pi_\theta \right]  \text{(using the log-derivative trick)} \\
-                                             &= -\hat{\mathbb{E}}_t \left[ r_t(\theta) \cdot \hat{A}_t \cdot \nabla_\theta \log \pi_\theta \right]  \text{(substituting $r_t(\theta) = \frac{\pi_\theta}{\pi_{\text{SFT}}}$)} \\
-                \text{Final derivative w.r.t. } \theta: \\
-                \nabla_\theta L_{\text{PPO}} &= - r_t(\theta) \cdot \hat{A}_t \cdot \nabla_\theta \log \pi_\theta
-                \end{aligned}
-                
-
-                $$
-                
-            </div>
-
-            <h3>Putting It All Together with maths</h3>
-            <p>From above, the penalized reward, R = 2.4942.</p>
-            <p><strong>Case 1 (Ratio is Clipped): When the derivative is zero</strong></p>
-            <p>Let consider a simple example, where we have the following values:</p>
-                <strong>Probability ratio r<sub>t</sub>(&theta;)</strong> = 1.2, <br>
-                <strong>Advantage A<sub>t</sub></strong> = 1.5 (meaning this response performed better than expected), and <br> 
-                <strong>Clipping Parameter (&epsilon;)</strong>: &epsilon; = 0.2 (meaning the ratio is capped between 1 - 0.2 = 0.8 and 1 + 0.2 = 1.2).</p>
-            <p>Now, we can calculate the <strong>PPO Loss</strong>:</p>
+            <p>The DPO loss function is derived from the principle of maximizing the likelihood of the chosen response while minimizing the likelihood of the rejected response. The sigmoid function is used to convert the difference in scores into a probability, which is then used in the cross-entropy loss.</p>
             <div style="background: #f4f5f7; padding: 12px 16px; border-radius: 4px; margin: 12px 0; font-family: monospace;">
                 $$
                 \begin{aligned}
-                L_{PPO}(\theta) &= - \mathbb{E}_t \left[ \min\left(r_t(\theta)\hat{A}_t,; \operatorname{clip}(r_t(\theta),1-\epsilon,1+\epsilon)\hat{A}_t\right) \right] \\
-                &= - \min(1.2 \times 1.5,; \operatorname{clip}(1.2,0.8,1.2)\times 1.5) \\
-                &= - \min(1.8,; 1.2 \times 1.5) \\
-                &= - \min(1.8,; 1.8) \\
-                L_{PPO}(\theta) &= -1.8
+                \nabla_{\theta} L_{DPO}(\theta) &= \nabla_{\theta} (- log (\sigma (score_{w} - score_{l}))) \\
+                &= \nabla_{\theta} \bigg (- log (\sigma (\beta \log \frac{\pi_\theta(y_w|x)}{\pi_{SFT}(y_w|x)} - \beta \log \frac{\pi_\theta(y_l|x)}{\pi_{SFT}(y_l|x)})) \bigg) \\
+                
+                \nabla_\theta L_{\text{DPO}}(\theta) &= -\beta \mathbb{E} \left[ \underbrace{\left( 1 - \sigma(score_w - score_l) \right)}_{\text{Weighting factor}} \left( \nabla_\theta \log \pi_\theta(y_w\vert{}x) - \nabla_\theta \log \pi_\theta(y_l\vert{}x) \right) \right] \\
+                
                 \end{aligned}
                 $$
-            </div>
-
-            <p>Now, the <strong>derivative of the PPO Loss</strong>:</p>
-            <p>Since, r<sub>t</sub>(&theta;) = 1.2 is at the upper clipping boundary (1 + &epsilon; = 1.2), the derivative of the loss function with respect to &theta; is zero.</p>
-            <div style="background: #f4f5f7; padding: 12px 16px; border-radius: 4px; margin: 12px 0; font-family: monospace;">
                 $$
-                \begin{aligned}
-                \frac{\partial L_{\text{PPO}}(\theta)}{\partial \theta} &= 0
-                \end{aligned}
+                \text{where,}
+                \nabla_\theta \log \pi_\theta(y_w\vert{}x): \text{Push the weights to increase the probability of the chosen response.} \\
+                -\nabla_\theta \log \pi_\theta(y_l\vert{}x): \text{Push the weights to decrease the probability of the rejected response.} \\
                 $$
             </div>
+            <p>The Weighting Factor: If the model is already doing a good job ranking chosen over rejected, the sigmoid term approaches 1, making the weighting factor approach 0 (stopping unnecessary updates). If the model gets it wrong, the gradient spikes, forcing a heavy correction.</p>
             
-            <p>This means that the optimizer will not update the model parameters for this particular step, as it has reached the maximum allowed change in probability ratio.</p>
-            <p><strong>Interpretation:</strong> This is a safety break, if a policy update tries to push the model too far too fast, PPO will stop updating the weight in this direction.</p>
 
-            <p><strong>Case 2 (Ratio is Not Clipped): When the derivative is non-zero</strong></p>
-            <p>Let consider a simple example, where we have the following values:</p>
-                <strong>Probability ratio r<sub>t</sub>(&theta;)</strong> = 1.05, (It falls strictly between 0.8 and 1.2, so no clipping occurs.) <br>
-                <strong>Advantage A<sub>t</sub></strong> = 1.5 (meaning this response performed better than expected), and <br> 
-                <strong>Clipping Parameter (&epsilon;)</strong>: &epsilon; = 0.2 (meaning the ratio is capped between 1 - 0.2 = 0.8 and 1 + 0.2 = 1.2).</p>
-             <p>Now, we can calculate the <strong>PPO Loss</strong>:</p>
-            <div style="background: #f4f5f7; padding: 12px 16px; border-radius: 4px; margin: 12px 0; font-family: monospace;">
-                $$
-                \begin{aligned}
-                L_{PPO}(\theta) &= - \mathbb{E}_t \left[ \min\left(r_t(\theta)\hat{A}_t,; \operatorname{clip}(r_t(\theta),1-\epsilon,1+\epsilon)\hat{A}_t\right) \right] \\
-                &= - \min(1.05 \times 1.5,; \operatorname{clip}(1.05,0.8,1.2)\times 1.5) \\
-                &= - \min(1.575,; 1.2 \times 1.5) \\
-                &= - \min(1.575,; 1.8) \\
-                L_{PPO}(\theta) &= -1.575
-                \end{aligned}
-                $$
-            </div>
-
-            <p>Now, the <strong>derivative of the PPO Loss</strong>:</p>
-            <p>Since, r<sub>t</sub>(&theta;) = 1.05 is not at the clipping boundary (unclipped), the objective function depends directly on the model parameter, &theta;.</p>
-            <div style="background: #f4f5f7; padding: 12px 16px; border-radius: 4px; margin: 12px 0; font-family: monospace;">
-                $$
-                \begin{aligned}
-                L_{PPO}(\theta) &= -1.575 \times \frac{\partial \pi_{\theta} }{\partial \theta}
-                \end{aligned}
-                $$
-            </div>
-
-            <p>The model weights (&theta;) are successfully updated by the gradient descent, so that next time it sees a similar prompt, it is sightly more likely to gnerate this preferred style of respone.</p>
-            
         <!--
         <div class="confluence-panel warning">
             <strong>Warning:</strong> 
