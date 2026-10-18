@@ -243,7 +243,7 @@
             <li><a href="#overview">1. Overview & Context</a></li>
             <li><a href="#whydpo">2. Why DPO?</a></li>
             <li><a href="#dpo">3. Direct Policy Optimization (DPO)</a></li>
-            <li><a href="#dpovsppo">4. How DPO differs from PPO?</a></li>
+            <li><a href="#finetuningwithdpo">4. Fine-tuning the Policy with DPO</a></li>
         </ul>
     </div>
 
@@ -323,7 +323,7 @@
 }</pre>
 
         
-        <h2 id="fine-tune_policy">4. Fine-tuning the Policy with DPO</h2>
+        <h2 id="finetuningwithdpo">4. Fine-tuning the Policy with DPO</h2>
             <p>In this section, we will explore how the Policy LLM is fine-tuned using Direct Policy Optimization (DPO) to align it with human preferences.</p>    
 
             <p>Here, we combine everything into DPO training step to update LLM weights (<code>&theta;</code>).</p>
@@ -348,10 +348,15 @@ y_l ───►│ SFT LLM  │ ───► log probabilities
 
             <h3>Calculate the Implicit Rewards</h3>
             <div style="background: #f4f5f7; padding: 12px 16px; border-radius: 4px; margin: 12px 0; font-family: monospace;">
-                $$score_{w} = \beta \log \frac{\pi_\theta(y_w|x)}{\pi_{SFT}(y_w|x)} $$ and
-                $$score_{l} = \beta \log \frac{\pi_\theta(y_l|x)}{\pi_{SFT}(y_l|x)} $$
-                where, 
-                &beta; is a temperature hyperparameter that controls how strictly the model sticks to the reference mode.
+                $$
+                \begin{aligned}
+                score_{w} &= \beta \log \frac{\pi_\theta(y_w|x)}{\pi_{SFT}(y_w|x)}, \text{and} \\
+                score_{l} &= \beta \log \frac{\pi_\theta(y_l|x)}{\pi_{SFT}(y_l|x)}  \\
+                \text{where}, \\
+                \beta = &\text{ temperature parameter that controls how strictly the model} \\
+                 &\text{sticks to the reference mode. } 
+                \end{aligned}
+                $$
             </div>
 
             <p>It checks how confident the policy model &pi;<sub>&theta;</sub> is, about this response compared to the reference model &pi;<sub>SFT</sub>.</p>
@@ -359,8 +364,12 @@ y_l ───►│ SFT LLM  │ ───► log probabilities
             <h3>DPO Loss Function</h3>
             <p>The DPO algorithm uses a simple standard sigmoid cross-entropy loss function to update the policy parameters:</p>
                 <div style="background: #f4f5f7; padding: 12px 16px; border-radius: 4px; margin: 12px 0; font-family: monospace;">
-                    $$L_{DPO}(\theta) = - log (\sigma (score_{w} - score_{l}))$$
-                    $$L_{DPO}(\theta) = - log [(\sigma \beta \log \frac{\pi_\theta(y_w|x)}{\pi_{SFT}(y_w|x)} - \beta \log \frac{\pi_\theta(y_l|x)}{\pi_{SFT}(y_l|x)})]$$
+                $$
+                \begin{aligned}
+                    L_{DPO}(\theta) &= - log (\sigma (score_{w} - score_{l})) \\
+                    L_{DPO}(\theta) &= - log \bigg[ \big(\sigma \beta \log \frac{\pi_\theta(y_w|x)}{\pi_{SFT}(y_w|x)} - \beta \log \frac{\pi_\theta(y_l|x)}{\pi_{SFT}(y_l|x)} \big) \bigg]
+                \end{aligned}
+                $$
                 </div>
             
             <h3>Derivation of the DPO Loss Function</h3>
@@ -384,6 +393,40 @@ y_l ───►│ SFT LLM  │ ───► log probabilities
             </div>
             <p>The Weighting Factor: If the model is already doing a good job ranking chosen over rejected, the sigmoid term approaches 1, making the weighting factor approach 0 (stopping unnecessary updates). If the model gets it wrong, the gradient spikes, forcing a heavy correction.</p>
             
+            <h3>Mathematical and Numerical Example</h3>
+            <p>Lets say, we pass our prompt and responses through both models, &pi;<sub>SFT</sub> and &pi;<sub>&theta;</sub>, yielding the following sequence log-probabilities log &pi;:</p>
+            <div style="background: #f4f5f7; padding: 12px 16px; border-radius: 4px; margin: 12px 0; font-family: monospace;">
+
+            $$
+            \begin{aligned}
+            \text{Reference Model, } \pi_{SFT}: \\
+            log \pi_{SFT}(y_w|x) &= -2.0 \\
+            log \pi_{SFT}(y_l|x) &= -4.0 \\
+
+            \text{Active Policy Model, } \pi_\theta: \\
+            log \pi_\theta(y_w|x) &= -1.5, \text{(model got better at predicting the chosen response)} \\
+            log \pi_\theta(y_l|x) &= -4.5, \text{(model got worse at predicting the rejected response)} \\
+            \\
+            &\text{Let the temperature hyperparameter be, } \beta = 0.1 \\
+            \\
+            score_{w} &= \beta \log \frac{\pi_\theta(y_w|x)}{\pi_{SFT}(y_w|x)} = 0.1 * (-1.5 - (-2.0)) = 0.05 \\
+            score_{l} &= \beta \log \frac{\pi_\theta(y_l|x)}{\pi_{SFT}(y_l|x)} = 0.1 * (-4.5 - (-4.0)) = -0.05 \\
+            \\
+            &\text{\textbf{Bradley-Terry DPO Loss:}} \\
+            L_{DPO}(\theta) &= - log (\sigma (score_{w} - score_{l})) \\ 
+            &= - log (\sigma (0.05 - (-0.05))) \\
+            &= - log (\sigma (0.1)) \approx 0.6446 \\
+            \\
+            &\text{\textbf{Gradient of DPO Loss:}} \\
+            \nabla_\theta L_{\text{DPO}}(\theta) &= -\beta  \big[ \left( 1 - \sigma(score_w - score_l) \right) \left[ \nabla_\theta \log \pi_\theta(y_w\vert{}x) - \nabla_\theta \log \pi_\theta(y_l\vert{}x) \right] \big] \\
+            &= -0.1 * \left( 1 - \sigma(0.1) \right) \left( \nabla_\theta \log \pi_\theta(y_w\vert{}x) - \nabla_\theta \log \pi_\theta(y_l\vert{}x) \right) \\
+            &= -0.03554 * \left( \nabla_\theta \log \pi_\theta(y_w\vert{}x) - \nabla_\theta \log \pi_\theta(y_l\vert{}x) \right)
+            \end{aligned}
+            $$
+            </div>
+            
+            <p>If the model gets it right: As &sigma; approaches 1.0 (meaning the model strongly prefers the chosen response), the term (1 - &sigma;) approaches 0, No unnecessary gradient updates.</p>   
+            <p>If the model gets it wrong: The gradient scales up, forcefully tweaking the internal weights (&theta;) to increase the probability of generating y<sub>w</sub> while decreasing the probability of generating y<sub>l</sub>.</p>
 
         <!--
         <div class="confluence-panel warning">
