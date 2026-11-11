@@ -857,6 +857,28 @@ section,
   bottom: 0;
 }
 
+/*For 2 Links*/
+/* Stack icons vertically ONLY when the "dual-links" class is present */
+.portfolio .portfolio-item .portfolio-info.dual-links .preview-link,
+.portfolio .portfolio-item .portfolio-info.dual-links .details-link {
+  position: absolute;
+  right: 15px;
+  font-size: 24px;
+  line-height: 1;
+}
+
+/* Position the top icon (GitHub) */
+.portfolio .portfolio-item .portfolio-info.dual-links a.details-link:first-of-type,
+.portfolio .portfolio-item .portfolio-info.dual-links .preview-link {
+  top: 20px;
+}
+
+/* Position the bottom icon (YouTube) stacked directly underneath */
+.portfolio .portfolio-item .portfolio-info.dual-links a.details-link:last-of-type {
+  top: 55px; 
+}
+/*For 2 Links END*/
+
 .portfolio-title {
   font-size: 18px;
   font-weight: 700;

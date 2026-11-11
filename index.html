@@ -624,6 +624,7 @@
             <li data-filter="*" class="filter-active">All</li>
             <li data-filter=".filter-machinelearning">Machine/Deep Learning</li>
             <li data-filter=".filter-cv">Computer Vision / Neural Rendering</li>
+            <li data-filter=".filter-robotics">Robotics & Embodied AI</li>
             <li data-filter=".filter-nlp">Natural Language Processing</li>
             <li data-filter=".filter-genai">GenAI</li>
             <li data-filter=".filter-reinforcementlearning">Reinforcement Learning</li>
@@ -654,7 +655,7 @@
             </div><!-- End Portfolio Item -->
 
             <!-- Neural Rendering Potsdam Project -->
-            <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-cv filter-machinelearning">
+            <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-cv filter-machinelearning filter-robotics">
               <h4 class="portfolio-title">Robots walking the streets of Potsdam</h4>
               <img src="assets/img/neural_rendering_project.png" class="img-fluid" alt="">
               <div class="portfolio-info">
@@ -662,6 +663,17 @@
                 <a href="assets/img/neural_rendering_project.png" title="Robots walking the street of Potsdam" data-gallery="portfolio-gallery-product" class="glightbox preview-link"></a>
                 <!-- <a href="https://github.com/MohammadWasil/Self-Driving-Car-Python" title="More Details" class="details-link"><i class="bi bi-github"></i></a> -->
                 <a href="https://youtu.be/OHWaJfTD4Gc" title="More Details" class="details-link" target="_blank"><i class="bi bi-youtube"></i></a>
+              </div>
+            </div><!-- End Portfolio Item -->
+
+            <!-- Neural Rendering Potsdam Project -->
+            <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-cv filter-machinelearning filter-robotics">
+              <h4 class="portfolio-title">VLA: Unity-based Simulation for Franka FR3 Robot</h4>
+              <img src="assets/img/unity3d_robotic_franka_hand_fr3_setup.png" class="img-fluid" alt="">
+              <div class="portfolio-info">
+                <p>A Unity simulation environment for the Franka FR3 robot featuring custom URDF creation and robotic manipulation tasks. Captures camera and state data to interface with cloud-based Vision-Language-Action (VLA) inference engines, executing predicted actions in real-time.</p>
+                <!-- <a href="assets\img\unity3d_robotic_franka_hand_fr3_setup.png" title="Unity-based Simulation for Franka FR3 Robot" data-gallery="portfolio-gallery-product" class="glightbox preview-link"></a> -->
+                <a href="https://github.com/MohammadWasil/Unity3d-robotics-simulation-VLA" title="More Details" class="details-link"><i class="bi bi-github"></i></a>
               </div>
             </div><!-- End Portfolio Item -->
 
@@ -679,40 +691,44 @@
             <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-nlp filter-machinelearning">
               <h4 class="portfolio-title">Neural Machine Translation with Attention</h4>
               <img src="assets/img/NMT_result.png" class="img-fluid" alt="">
-              <div class="portfolio-info">
+              <div class="portfolio-info dual-links">
                 <p>Implemented a Spanish-to-English Neural Machine Translation model with an Attention mechanism (from scratch), achieved a BLEU score of 25.37, comparable to the state-of-the-art.</p>
-                <a href="assets/img/NMT_result.png" title="Neural Machine Translation with Attention" data-gallery="portfolio-gallery-app" class="glightbox preview-link"></a>
+                <!--<a href="assets/img/NMT_result.png" title="Neural Machine Translation with Attention" data-gallery="portfolio-gallery-app" class="glightbox preview-link"></a>-->
                 <a href="https://www.researchgate.net/publication/355917108_Neural_Machine_Translation_with_Attention" title="More Details" class="details-link" target="_blank"><i class="bi bi-researchgate"></i></a>
+                <a href="https://github.com/MohammadWasil/Machine-Translation-with-Attention-Mechanism-From-Spanish-to-English-translation" title="More Details" class="details-link" target="_blank"><i class="bi bi-github"></i></a>
               </div>
             </div><!-- End Portfolio Item -->
 
             <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-genai filter-reinforcementlearning">
               <h4 class="portfolio-title">Blender Text-to-Node ChatBot (WiP)</h4>
               <img src="assets/img/Blender_Chatbot_Workflow.png" class="img-fluid" alt="">
-              <div class="portfolio-info">
+              <div class="portfolio-info dual-links">
                 <p>Developed an Open source 3D Blender add-on that translates natural language into Shader and Geometry nodes (text-to-code) by fine-tuning a Small Language Model (SLM) using RLHF with PPO and integrating it with Blender’s API.</p>
-                <a href="assets/img/Blender_Chatbot_Workflow.png" title="Blender Text-to-Node ChatBot" data-gallery="portfolio-gallery-product" class="glightbox preview-link"></a>
+                <!-- <a href="assets/img/Blender_Chatbot_Workflow.png" title="Blender Text-to-Node ChatBot" data-gallery="portfolio-gallery-product" class="glightbox preview-link"></a> -->
                 <a href="https://github.com/MohammadWasil/Blender-Text-to-Node-ChatBot" title="More Details" class="details-link" target="_blank"><i class="bi bi-github"></i></a>
+                <a href="https://www.youtube.com/watch?v=Gsdr474TTXE" title="More Details" class="details-link" target="_blank"><i class="bi bi-youtube"></i></a>
               </div>
             </div><!-- End Portfolio Item -->
 
             <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-cv filter-machinelearning">
               <h4 class="portfolio-title">Conditional GANs - Generate New Faces</h4>
               <img src="assets/img/GANS CelebA Unconditional.gif" class="img-fluid" alt="">
-              <div class="portfolio-info">
+              <div class="portfolio-info dual-links">
                 <p>Generated realistic faces from CelebA dataset using conditional GANs, optimizing attribute selection for improved results.</p>
-                <a href="assets/img/GANS CelebA Unconditional.gif" title="Product 2" data-gallery="portfolio-gallery-product" class="glightbox preview-link"></a>
+                <!--<a href="assets/img/GANS CelebA Unconditional.gif" title="Product 2" data-gallery="portfolio-gallery-product" class="glightbox preview-link"></a>-->
                 <a href="https://www.researchgate.net/publication/355917170_Conditional_Generative_Adversarial_Network_generate_new_face_images_based_on_attributes" title="More Details" class="details-link" target="_blank"><i class="bi bi-researchgate"></i></a>
+                <a href="https://github.com/MohammadWasil/Conditional-Generative-Adversarial-Network-cGAN-Generate-New-Faces" title="More Details" class="details-link" target="_blank"><i class="bi bi-github"></i></a>
               </div>
             </div><!-- End Portfolio Item -->
             
             <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-nlp filter-machinelearning">
               <h4 class="portfolio-title">Predicting User Affiliation of YouTube Commenters with Hierarchical Attention</h4>
               <img src="assets/img/HAN.png" class="img-fluid" alt="">
-              <div class="portfolio-info">
+              <div class="portfolio-info dual-links">
                 <p>Built a large-scale dataset of 10 million YouTube comments and classified user affiliation using a Hierarchical Attention Network trained on 20K labeled samples, achieving 89.69% accuracy.</p>
-                <a href="assets/img/HAN.png" title="HAN" data-gallery="portfolio-gallery-branding" class="glightbox preview-link"></a>
+                <!--<a href="assets/img/HAN.png" title="HAN" data-gallery="portfolio-gallery-branding" class="glightbox preview-link"></a>-->
                 <a href="https://www.researchgate.net/publication/364308344_Political_Affiliation_of_YouTube_Commenters_with_Hierarchical_Attention_Network" title="More Details" class="details-link" target="_blank"><i class="bi bi-researchgate"></i></a>
+                <a href="https://github.com/MohammadWasil/Hierarchical-Attention-Network-for-Political-Affiliation-of-Youtube-Commenters" title="More Details" class="details-link" target="_blank"><i class="bi bi-github"></i></a>
               </div>
             </div><!-- End Portfolio Item -->
 
