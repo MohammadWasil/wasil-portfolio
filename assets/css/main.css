@@ -879,6 +879,40 @@ section,
 }
 /*For 2 Links END*/
 
+/* For 3 Links */
+.portfolio .portfolio-item .portfolio-info.triple-links a {
+  position: absolute;
+  right: 15px;
+  font-size: 24px;
+  line-height: 1;
+}
+
+.portfolio .portfolio-item .portfolio-info.triple-links a:nth-of-type(1) {
+  top: 20px;
+}
+
+.portfolio .portfolio-item .portfolio-info.triple-links a:nth-of-type(2) {
+  top: 55px;
+}
+
+.portfolio .portfolio-item .portfolio-info.triple-links a:nth-of-type(3) {
+  top: 90px;
+}
+/* For 3 Links END */
+
+.portfolio .portfolio-item .portfolio-info .hf-icon {
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* If using inline SVG and you want it to inherit the link's text color: */
+.portfolio .portfolio-item .portfolio-info svg.hf-icon {
+  fill: currentColor;
+}
+
+
 .portfolio-title {
   font-size: 18px;
   font-weight: 700;
